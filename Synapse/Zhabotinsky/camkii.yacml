@@ -9,22 +9,26 @@ compartment PSD {
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
     P0 [n_init = 20, plot = true ];
 
-    // CamKII molecules with 1 subunits of 6 subunits of ring phosporylated
+    // CamKII molecules with 1 subunits out of 6 subunits of ring phosporylated
     P1 [n_init = 0, plot = true ];
+    P2 [n_init = 0, plot = true ];
 
     // All CamKII subunits are phosporylated
     PS [ n_init = 0, plot = true  ];
 
 
-    /* The rate constant kf of this equation is defined as v1 in paper.
-    v1 = K1(ca/KH1)^6 / (1+(ca/KH1)^3)^2 
-    KH1 = 0.7e-3 mole/m^3.
-    K1 = 1.5
-    NOTE: at basal [ca], v1 = 7.61e-5
+    /* 1-step of phosphorylation, 1 unit of phosphorylation
+    Rate constant per subunit:
+        v1 = K1(ca/KH1)^8 / (1+(ca/KH1)^4)^2 
+        KH1 = 0.7e-3 mole/m^3, K1 = 1.5
     */
-    r_p0_p1 [ kf =  "k1*(ca/kh1)^8/(1+(ca/kh1)^4)^2", kb = 0.0 
-        kh1 = "0.4e-3", k1 = 0.5 ];
+    r_p0_p1 [ kf =  "N*k1*(ca/kh1)^8/(1+(ca/kh1)^4)^2", kb = 0.0 
+        kh1 = "0.4e-3", k1 = 0.5, N = 6];
     P0 -> r_p0_p1 -> P1;
+
+    r_p1_p2 [ kf = "k1*(ca/kh1)^4/(1+(ca/kh1)^4)" , kb=0.0
+        , kh1="0.4e-3", k1=0.5];
+    P1 -> r_p1_p2 -> P2;
 
     /*
      * Simulation related
