@@ -20,11 +20,11 @@ compartment PSD {
 
     // It is useful to create v1, v2 and v3 (rate constants) as POOLS and use
     // their concentration in other reactions.
-    V1 [ plot=True,  conc = "k1*((ca/kh1)^4/(1 + (ca/kh1)^4))^2*P0", k1=1, kh1 = "4e-3" ];
 
     // All CaMKII is unphosphorylated in the begining.
-    P0 [conc_init = "30e-3", conc = "20e-3", plot = true ];
+    P0 [ conc = "4*ca", plot = true ];
 
+    V1 [ plot=True,  conc = "P0*((ca/kh1)^4/(1 + (ca/kh1)^4))^2", k1=1, kh1 = "4e-3" ];
 
     // CamKII molecules with 1 subunits out of 6 subunits of ring phosporylated
     P1 [conc_init = 0, plot = true ];
@@ -47,19 +47,20 @@ compartment PSD {
         
         N = 10; Zhabotinksy uses 10 subunits.
     */
-    r_p0_p1 [ kf =  "N*k1*(F)^2*P0"
-        , F = "(ca/kh1)^4/(1 + (ca/kh1)^4)"
-        , kb = 0.0 
-        , kh1 = "4e-3", k1 = 0.5, N = 10
-        ];
-    //P0 -> r_p0_p1 -> P1;
 
-    r_p1_p2 [ kf = "k1*F*P1" 
-        , F = "(ca/kh1)^4/(1+(ca/kh1)^4)"
-        , kb=0.0
-        , kh1="4e-3", k1=0.5
-        ];
-    //P1 -> r_p1_p2 -> P2;
+    //r_p0_p1 [ kf =  "N*k1*(F)^2*P0"
+    //    , F = "(ca/kh1)^4/(1 + (ca/kh1)^4)"
+    //    , kb = 0.0 
+    //    , kh1 = "4e-3", k1 = 0.5, N = 10
+    //    ];
+    ////P0 -> r_p0_p1 -> P1;
+
+    //r_p1_p2 [ kf = "k1*F*P1" 
+    //    , F = "(ca/kh1)^4/(1+(ca/kh1)^4)"
+    //    , kb=0.0
+    //    , kh1="4e-3", k1=0.5
+    //    ];
+    ////P1 -> r_p1_p2 -> P2;
 
     /*
      * Simulation related
@@ -68,6 +69,6 @@ compartment PSD {
     dt = 0.001
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 300
+    sim_time = 100
 }
 

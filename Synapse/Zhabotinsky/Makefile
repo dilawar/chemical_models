@@ -2,6 +2,7 @@ all : simulate plot
 	echo "done"
 
 simulate : ./camkii.py ./camkii.yacml
+	rm -f ./camkii.yacml.dat
 	python camkii.py   | tee __log__.txt
 
 plot :  camkii.yacml.dat  camkii.yacml
