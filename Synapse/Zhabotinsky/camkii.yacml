@@ -20,14 +20,14 @@ compartment PSD {
 
     // It is useful to create v1, v2 and v3 (rate constants) as POOLS and use
     // their concentration in other reactions.
-    V1 [ conc = "k1*((ca/kh1)^4/(1 + (ca/kh1)^4))^2*P0", k1=1, kh1 = "4e-3" ];
+    V1 [ plot=True,  conc = "k1*((ca/kh1)^4/(1 + (ca/kh1)^4))^2*P0", k1=1, kh1 = "4e-3" ];
+
+    // All CaMKII is unphosphorylated in the begining.
+    P0 [conc_init = "30e-3", conc = "20e-3", plot = true ];
+
 
     // CamKII molecules with 1 subunits out of 6 subunits of ring phosporylated
     P1 [conc_init = 0, plot = true ];
-
-    // All CaMKII is unphosphorylated in the begining.
-    P0 [conc_init = "30e-3", conc = "V1", plot = true ];
-
     P2 [conc_init = 0, plot = true ];
     P3 [conc_init = 0, plot = true ];
     P4 [conc_init = 0, plot = true ];
@@ -35,8 +35,7 @@ compartment PSD {
     P6 [conc_init = 0, plot = true ];
     P7 [conc_init = 0, plot = true ];
     P8 [conc_init = 0, plot = true ];
-    P9 [conc_init = 0, plot = true ];
-    P10 [conc_init = 0, plot = true ];
+
 
     // All CamKII subunits are phosporylated
     PS [ conc_init = 0, plot = true  ];
@@ -53,14 +52,14 @@ compartment PSD {
         , kb = 0.0 
         , kh1 = "4e-3", k1 = 0.5, N = 10
         ];
-    P0 -> r_p0_p1 -> P1;
+    //P0 -> r_p0_p1 -> P1;
 
     r_p1_p2 [ kf = "k1*F*P1" 
         , F = "(ca/kh1)^4/(1+(ca/kh1)^4)"
         , kb=0.0
         , kh1="4e-3", k1=0.5
         ];
-    P1 -> r_p1_p2 -> P2;
+    //P1 -> r_p1_p2 -> P2;
 
     /*
      * Simulation related
