@@ -1,33 +1,65 @@
+/* This model is due to Zhabotinksy and others.
+*/
 compartment PSD {
 
     // 10^6 nano-meter^3.
     volume = "1e-21"
 
-    ca [ conc = "1e-4+1e-3*(t>10 && t<25 || t >110 && t < 125 || t > 210 && t <
-    225 ?1:0)", plot = True ];
+    /* Zhabotinksy applied 20 uM pulse of Ca++. That activates CaMKII within 2
+     * seconds. We are using 10 uM.
+     */
+    ca [ conc = "1e-4+20e-3*(t>10 && t< 20 || t >120 && t < 125 || t > 250 && t <
+    260 ?1:0)", plot = True ];
 
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
-    P0 [n_init = 20, plot = true ];
+    // Concentration has been reported to vary from 0.1e-3 mM to 30e-3 mM. Here
+    // we take 33e-3 to have 20 molecules in PSD.
+
+    // Total concentration of CaMKII
+    ek [conc_init = "30e-3", constant = True ];
+
+    // It is useful to create v1, v2 and v3 (rate constants) as POOLS and use
+    // their concentration in other reactions.
+    V1 [ conc = "k1*((ca/kh1)^4/(1 + (ca/kh1)^4))^2*P0", k1=1, kh1 = "4e-3" ];
 
     // CamKII molecules with 1 subunits out of 6 subunits of ring phosporylated
-    P1 [n_init = 0, plot = true ];
-    P2 [n_init = 0, plot = true ];
+    P1 [conc_init = 0, plot = true ];
+
+    // All CaMKII is unphosphorylated in the begining.
+    P0 [conc_init = "30e-3", conc = "V1", plot = true ];
+
+    P2 [conc_init = 0, plot = true ];
+    P3 [conc_init = 0, plot = true ];
+    P4 [conc_init = 0, plot = true ];
+    P5 [conc_init = 0, plot = true ];
+    P6 [conc_init = 0, plot = true ];
+    P7 [conc_init = 0, plot = true ];
+    P8 [conc_init = 0, plot = true ];
+    P9 [conc_init = 0, plot = true ];
+    P10 [conc_init = 0, plot = true ];
 
     // All CamKII subunits are phosporylated
-    PS [ n_init = 0, plot = true  ];
-
+    PS [ conc_init = 0, plot = true  ];
 
     /* 1-step of phosphorylation, 1 unit of phosphorylation
     Rate constant per subunit:
-        v1 = K1(ca/KH1)^8 / (1+(ca/KH1)^4)^2 
+        v1 = K1(ca/KH1)^8 / (1+(ca/KH1)^4)^2 P0
         KH1 = 0.7e-3 mole/m^3, K1 = 1.5
+        
+        N = 10; Zhabotinksy uses 10 subunits.
     */
-    r_p0_p1 [ kf =  "N*k1*(ca/kh1)^8/(1+(ca/kh1)^4)^2", kb = 0.0 
-        kh1 = "0.4e-3", k1 = 0.5, N = 6];
+    r_p0_p1 [ kf =  "N*k1*(F)^2*P0"
+        , F = "(ca/kh1)^4/(1 + (ca/kh1)^4)"
+        , kb = 0.0 
+        , kh1 = "4e-3", k1 = 0.5, N = 10
+        ];
     P0 -> r_p0_p1 -> P1;
 
-    r_p1_p2 [ kf = "k1*(ca/kh1)^4/(1+(ca/kh1)^4)" , kb=0.0
-        , kh1="0.4e-3", k1=0.5];
+    r_p1_p2 [ kf = "k1*F*P1" 
+        , F = "(ca/kh1)^4/(1+(ca/kh1)^4)"
+        , kb=0.0
+        , kh1="4e-3", k1=0.5
+        ];
     P1 -> r_p1_p2 -> P2;
 
     /*
@@ -37,6 +69,6 @@ compartment PSD {
     dt = 0.001
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 500
+    sim_time = 300
 }
 
