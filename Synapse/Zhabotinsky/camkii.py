@@ -17,6 +17,7 @@ import sys
 sys.path.append('../../..')
 import yacml
 import moose
+import moose.utils as mu
 
 def add_extra(model):
     """Add extra information to model
@@ -35,6 +36,7 @@ def main():
     modelfile = "camkii.yacml"
     model = yacml.loadYACML(modelfile)
     #add_extra(model)
+    mu.graphviz.writeGraphviz('model.dot')
     model.run()
 
 if __name__ == '__main__':
