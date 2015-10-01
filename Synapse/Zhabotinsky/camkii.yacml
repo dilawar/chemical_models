@@ -24,10 +24,14 @@ compartment PSD {
     // All CaMKII is unphosphorylated in the begining.
     P0 [ conc = "4*ca", plot = true ];
 
-    V1 [ plot=True,  conc = "P0*((ca/kh1)^4/(1 + (ca/kh1)^4))^2", k1=1, kh1 = "4e-3" ];
+    V1 [ plot=True
+        , conc = "P1+1e-3*((ca/kh1)^6/(1+(ca/kh1)^3)^2)"
+        , k1=1, kh1 = "4e-3" 
+        ];
+
+    P1 [conc_init = "1e-3", conc = "1e-3", plot = true ];
 
     // CamKII molecules with 1 subunits out of 6 subunits of ring phosporylated
-    P1 [conc_init = 0, plot = true ];
     P2 [conc_init = 0, plot = true ];
     P3 [conc_init = 0, plot = true ];
     P4 [conc_init = 0, plot = true ];
