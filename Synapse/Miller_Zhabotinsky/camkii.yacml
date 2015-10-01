@@ -50,17 +50,17 @@ compartment PSD {
      */
 
     pp1_sp [ n_init = 0, plot = true ];
-    r_pp1_sp_cplx [ kf = "25e3", kb = 0 ];
+    r_pp1_sp_cplx [ kf = "25", kb = 0 ];
     pp1, Sp -> r_pp1_sp_cplx -> pp1_sp;
 
-    r_pp1_dephos [ kf = 10, kb = 0 ];
+    r_pp1_dephos [ kf = 1, kb = 0 ];
     pp1_sp -> r_pp1_dephos -> pp1, S;
 
     /* NOTE: Can't use this equivalent scheme since intermediates are used
     // elsewhere in model.
     */
     //r_dephospho_enz [ enzyme = PP1, km = "0.4e-3", kcat = 10 ];
-    //CamKII_up -> r_dephospho_enz -> CamKII_down;
+    //Sp -> r_dephospho_enz -> S;
 
     /*********************************************************************
      * PP1.Sp + I1P <----> PP1.Sp.I1P 
@@ -82,6 +82,6 @@ compartment PSD {
     dt = 0.001
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 50
+    sim_time = 500
 }
 

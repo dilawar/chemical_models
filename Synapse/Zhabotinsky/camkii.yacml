@@ -1,5 +1,7 @@
-/* This model is due to Zhabotinksy and others.
-*/
+/* 
+ * This model is due to Zhabotinksy and others.
+ */
+
 compartment PSD {
 
     // 10^6 nano-meter^3.
@@ -8,28 +10,33 @@ compartment PSD {
     /* Zhabotinksy applied 20 uM pulse of Ca++. That activates CaMKII within 2
      * seconds. We are using 10 uM.
      */
-    ca [ conc = "1e-4+20e-3*(t>10 && t< 20 || t >120 && t < 125 || t > 250 && t <
-    260 ?1:0)", plot = True ];
+    ca [ conc = "1e-4+20e-3*(t>10 && t< 20 || t >120 && t < 125 || t > 250 && t < 260 ?1:0)", plot = True ];
 
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
     // Concentration has been reported to vary from 0.1e-3 mM to 30e-3 mM. Here
     // we take 33e-3 to have 20 molecules in PSD.
 
     // Total concentration of CaMKII
-    ek [conc_init = "30e-3", constant = True ];
+    ek [ expr = "30e-3", constant = True ];
 
     // It is useful to create v1, v2 and v3 (rate constants) as POOLS and use
     // their concentration in other reactions.
 
     // All CaMKII is unphosphorylated in the begining.
-    P0 [ conc = "4*ca", plot = true ];
+    P0 [ conc = "30e-3", plot = true ];
 
     V1 [ plot=True
-        , conc = "P1+1e-3*((ca/kh1)^6/(1+(ca/kh1)^3)^2)"
-        , k1=1, kh1 = "4e-3" 
+        , conc = "P0*k1*((ca/kh1)^8/(1+(ca/kh1)^4)^2)"
+        , k1 = 0.5
+        , kh1 = "4e-3" 
         ];
 
-    P1 [conc_init = "1e-3", conc = "1e-3", plot = true ];
+    V2 [ plot = True
+        , expr = "P1*k1*(ca/kh1)^4/(1+(ca/kh1)^4)"
+        , k1 = 0.5, kh1 = "4e-3"
+        ];
+
+    P1 [conc = "1e-3", plot = true ];
 
     // CamKII molecules with 1 subunits out of 6 subunits of ring phosporylated
     P2 [conc_init = 0, plot = true ];
