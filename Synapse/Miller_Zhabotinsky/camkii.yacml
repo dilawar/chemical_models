@@ -3,7 +3,7 @@ compartment PSD {
     // 10^6 nano-meter^3.
     volume = "1e-20"
 
-    ca [ conc = "1e-4+1e-3*(t>50 && t<55 || t > 310 && t < 315 || t > 100 && t
+    ca [ conc = "1e-4+1e-3*(t>50 && t<52 || t > 310 && t < 315 || t > 100 && t
     < 110 ?1:0)", plot = True ];
 
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
@@ -36,7 +36,9 @@ compartment PSD {
     S1 -> r_p1_up -> Sp;
 
     // Phosphatase enzype
-    pp1 [ n_init = "20", plot = true ];
+    pp1 [ n_init = 20, plot = true 
+        // constant = True
+        ];
 
     I1_free [ conc_init = "0.1e-3", constant = true, plot = true ];
 
@@ -51,11 +53,17 @@ compartment PSD {
      */
 
     pp1_sp [ n_init = 0, plot = true ];
+    /*
     r_pp1_sp_cplx [ kf = "10/km", km="0.4e-3" kb = 0 ];
     pp1, Sp -> r_pp1_sp_cplx -> pp1_sp;
 
     r_pp1_dephos [ kf = 10, kb = 0 ];
     pp1_sp -> r_pp1_dephos -> pp1, S;
+    */
+
+    // Another reaction with rate constant v3
+    r_alternate_pp1_dephos [ kf = "3e-4", kb = 0 ]
+    Sp -> r_alternate_pp1_dephos -> S;
 
     /* NOTE: Can't use this equivalent scheme since intermediates are used
     // elsewhere in model.
@@ -67,7 +75,7 @@ compartment PSD {
      * PP1.Sp + I1P <----> PP1.Sp.I1P 
      * PP1.Sp ---> PP1 + S
      */
-    PP1_sp_I1P [n_init = 0 ];
+    PP1_sp_I1P [n_init = 0, plot = True ];
     r_pp1sp_i1p_to_pp1SpI1p [ kf = "1e5", kb = 0.1 ];
     pp1_sp, I1P -> r_pp1sp_i1p_to_pp1SpI1p -> PP1_sp_I1P;
 
@@ -84,4 +92,5 @@ compartment PSD {
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
     sim_time = 500
 }
+
 
