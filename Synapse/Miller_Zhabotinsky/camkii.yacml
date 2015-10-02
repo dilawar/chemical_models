@@ -3,7 +3,8 @@ compartment PSD {
     // 10^6 nano-meter^3.
     volume = "1e-20"
 
-    ca [ conc = "1e-4+1e-3*(t>50 && t<55 || t > 310 && t < 315 ?1:0)", plot = True ];
+    ca [ conc = "1e-4+1e-3*(t>50 && t<55 || t > 310 && t < 315 || t > 100 && t
+    < 110 ?1:0)", plot = True ];
 
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
     S [n_init = 20, plot = true ];
@@ -14,24 +15,12 @@ compartment PSD {
     // All CamKII subunits are phosporylated
     Sp [ n_init = 0, plot = true  ];
 
-    
-   // Phosphatase enzype
-   pp1 [ n_init = "20", constant = true, plot = true ];
-
-   I1_free [ conc_init = "0.1e-3", constant = true, plot = true ];
-
-   I1P [ plot = true 
-        , conc = "I1_free*(1+(ca/kh2)^3)/(ca/kh2)^3"
-        , kh2 = "0.3e-3"
-        , test_init = "conc AE 0.028;AH;0 0.1"
-        ];
-
     /* The rate constant kf of this equation is defined as v1 in paper.
-    v1 = K1(ca/KH1)^6 / (1+(ca/KH1)^3)^2 
-    KH1 = 0.7e-3 mole/m^3.
-    K1 = 1.5
-    NOTE: at basal [ca], v1 = 7.61e-5
-    */
+       v1 = K1(ca/KH1)^6 / (1+(ca/KH1)^3)^2 
+       KH1 = 0.7e-3 mole/m^3.
+       K1 = 1.5
+       NOTE: at basal [ca], v1 = 7.61e-5
+     */
     r_p0_p1 [ kf =  "k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
         kh1 = "0.7e-3", k1 = 1.5 ];
 
@@ -46,15 +35,26 @@ compartment PSD {
     ];
     S1 -> r_p1_up -> Sp;
 
+    // Phosphatase enzype
+    pp1 [ n_init = "20", plot = true ];
+
+    I1_free [ conc_init = "0.1e-3", constant = true, plot = true ];
+
+    I1P [ plot = true 
+        , conc = "I1_free*(1+(ca/kh2)^3)/(ca/kh2)^3"
+        , kh2 = "0.3e-3"
+        , test_init = "conc AE 0.028;AH;0 0.1"
+        ];
+
     /*
        This reaction dephoshprylates up state into down state.
      */
 
     pp1_sp [ n_init = 0, plot = true ];
-    r_pp1_sp_cplx [ kf = "25e3", kb = 0 ];
+    r_pp1_sp_cplx [ kf = "10/km", km="0.4e-3" kb = 0 ];
     pp1, Sp -> r_pp1_sp_cplx -> pp1_sp;
 
-    r_pp1_dephos [ kf = 1, kb = 0 ];
+    r_pp1_dephos [ kf = 10, kb = 0 ];
     pp1_sp -> r_pp1_dephos -> pp1, S;
 
     /* NOTE: Can't use this equivalent scheme since intermediates are used
@@ -67,9 +67,9 @@ compartment PSD {
      * PP1.Sp + I1P <----> PP1.Sp.I1P 
      * PP1.Sp ---> PP1 + S
      */
-    //PP1_sp_I1P [n_init = 0 ];
-    //r_pp1sp_i1p_to_pp1SpI1p [ kf = "1e5", kb = 0.1 ];
-    //pp1_sp, I1P -> r_pp1sp_i1p_to_pp1SpI1p -> PP1_sp_I1P;
+    PP1_sp_I1P [n_init = 0 ];
+    r_pp1sp_i1p_to_pp1SpI1p [ kf = "1e5", kb = 0.1 ];
+    pp1_sp, I1P -> r_pp1sp_i1p_to_pp1SpI1p -> PP1_sp_I1P;
 
     /** TURNOVER term */
     r_pp1sp_dissoc [ kf = "9.26e-6", kb = 0 ];
