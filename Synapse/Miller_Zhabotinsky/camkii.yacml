@@ -51,7 +51,7 @@ compartment PSD {
      */
 
     pp1_sp [ n_init = 0, plot = true ];
-    r_pp1_sp_cplx [ kf = "2.5", kb = 0 ];
+    r_pp1_sp_cplx [ kf = "25e3", kb = 0 ];
     pp1, Sp -> r_pp1_sp_cplx -> pp1_sp;
 
     r_pp1_dephos [ kf = 1, kb = 0 ];
