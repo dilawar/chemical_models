@@ -3,8 +3,7 @@ compartment PSD {
     // 10^6 nano-meter^3.
     volume = "1e-20"
 
-    ca [ conc = "1e-4+1e-3*(t>50 && t<52 || t > 310 && t < 315 || t > 100 && t
-    < 110 ?1:0)", plot = True ];
+    ca [ conc = "1e-4+1e-3*(t>50 && t<52 ?1:0)", plot = True ];
 
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
     S [n_init = 20, plot = true ];
@@ -52,7 +51,9 @@ compartment PSD {
        This reaction dephoshprylates up state into down state.
      */
 
-    pp1_sp [ n_init = 0, plot = true ];
+    pp1_sp [ n_init = 0,
+        //plot = true 
+        ];
     /*
     r_pp1_sp_cplx [ kf = "10/km", km="0.4e-3" kb = 0 ];
     pp1, Sp -> r_pp1_sp_cplx -> pp1_sp;
@@ -90,7 +91,7 @@ compartment PSD {
     dt = 0.001
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 500
+    sim_time = 10000
 }
 
 
