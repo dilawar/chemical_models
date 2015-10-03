@@ -3,7 +3,7 @@ compartment PSD {
     // 10^6 nano-meter^3.
     volume = "1e-20"
 
-    ca [ conc = "1e-4+1e-3*(t>50 && t<52 ?1:0)", plot = True ];
+    ca [ conc = "1e-4+1e-3*(t>50 && t<52 || t > 5000 && t < 5002 ?1:0)", plot = True ];
 
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
     S [n_init = 20, plot = true ];
