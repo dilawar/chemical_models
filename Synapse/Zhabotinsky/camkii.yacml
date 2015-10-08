@@ -21,10 +21,6 @@ compartment PSD {
 
     // It is useful to create v1, v2 and v3 (rate constants) as POOLS and use
     // their concentration in other reactions.
-
-    // All CaMKII is unphosphorylated in the begining.
-    P0 [ conc = "30e-3", plot = true ];
-
     V1 [ plot = True
         , V1 = "P0*k1*((ca/kh1)^8/(1+(ca/kh1)^4)^2)"
         , k1 = 2.0
@@ -36,6 +32,21 @@ compartment PSD {
         , k1 = 0.5
         , kh1 = "4e-3"
         ];
+
+    V3 [ plot = true
+        , V3="k2*ep/(km+1*P1+2*P2+3*P3)"
+        , k2 = 1.0, km = "0.4e-3"
+        ]
+
+    ep [ plot = true
+        , n_init = 10
+        , n_rate ="-k3*I*ep+k4*(10-ep)"
+        , k3 = "1", k4="1", I = "10"
+        ]
+
+    // All CaMKII is unphosphorylated in the begining.
+    P0 [ conc_rate = "-V1*10*P0+V3*P1", plot = true ];
+
 
     P1 [conc = 0.0, plot = true ];
     P2 [conc = 0.0, plot = true ];
