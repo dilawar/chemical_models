@@ -1,9 +1,22 @@
+/**
+* @brief Post Synaptic Density or PSD. This usually have volume in the range of
+* 1e6 cubic nano-meters.
+*/
 compartment PSD {
 
-    // 10^6 nano-meter^3.
+
+    // Volume of PSD in SI units.
     volume = "5e-21"
 
-    ca [ conc = "1e-4+1e-3*(t > 50 && t < 53 ?1:0)", plot = True ];
+    
+    /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
+    
+    * @note It's concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
+    * which can go up to 1e-3 This is input to many reaction.
+    */
+
+    //ca [ conc = "1e-4+1e-3*(t > 50 && t < 53 ?1:0)", plot = True ];
+    ca [ conc = "1e-4", plot = True ];
 
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
     S [ N = 20, plot = true ];
@@ -14,28 +27,39 @@ compartment PSD {
     // All CamKII subunits are phosporylated
     Sp [ N_init = 0, plot = true  ];
 
-    /* The rate constant kf of this equation is defined as v1 in paper.
-       v1 = K1(ca/KH1)^6 / (1+(ca/KH1)^3)^2 
-       KH1 = 0.7e-3 mole/m^3.
-       K1 = 1.5
-       NOTE: at basal [ca], v1 = 7.61e-5
-     */
-    r_p0_p1 [ kf =  "k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
-        kh1 = "0.7e-3", k1 = 1.5 ];
+    /**
+    * @brief  Reaction phosphorylates one subunit of CaMKII. This is a fast
+    * reaction. Within 2 seconds, almost all S turns into S1.
+    *
+    *
+    * The rate constant kf of this equation is defined as v1 in paper.
+    *   v1 = K1(ca/KH1)^6 / (1+(ca/KH1)^3)^2 
+    *   KH1 = 0.7e-3 mole/m^3.
+    *   K1 = 1.5
+    *   NOTE: at basal [ca], v1 = 7.61e-5
+    *
+    * COMMENT FROM THE REFERENCE:
+    * At the resting Ca2+ concentration, with our standard parameters, the initial
+    * autophosphorylation occurs at an average rate of one per 3.5 h per
+    * unphosphorylated ring, while the further phosphorylation steps occur at
+    * approximately one per 4 min per available “substrate” subunit
 
+    */
+
+    r_p0_p1 [ kf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
+        kh1 = "0.7e-3", k1 = 1.5 ];
     S -> r_p0_p1 -> S1;
 
 //    /* From one phosporylated unit of CamKII, this reaction phosporylates all
 //     * other units. The phosporylated unit acts as auto-catalyst.
 //     */
 //
-//    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0
-//    , kh1 = "0.7e-3", k1 = 1.5 
-//    ];
+//    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0, kh1 = "0.7e-3", k1 = 1.5 ];
 //    S1 -> r_p1_up -> Sp;
 //
+//
 //    // Phosphatase enzype
-//    pp1 [ n_init = 20, plot = true ];
+//    pp1 [ N_init = 20, plot = true ];
 //
 //    I1_free [ conc_init = "0.1e-3", constant = true, plot = true ];
 //
@@ -44,15 +68,14 @@ compartment PSD {
 //        , kh2 = "0.3e-3"
 //        , test_init = "conc AE 0.028;AH;0 0.1"
 //        ];
-
+//
 //    /*
 //       This reaction dephoshprylates up state into down state.
 //     */
 //
 //    // FIXME: For time being, disable the dephosphorylation step.
-//    pp1_sp [ n_init = 0,
-//        //plot = true 
-//        ];
+//    pp1_sp [ N_init = 0, plot = true ];
+//
 //    r_pp1_sp_cplx [ kf = "10/km", km="0.4e3" kb = 0 ];
 //    pp1, Sp -> r_pp1_sp_cplx -> pp1_sp;
 //
@@ -78,7 +101,7 @@ compartment PSD {
 //     * PP1.Sp + I1P <----> PP1.Sp.I1P 
 //     * PP1.Sp ---> PP1 + S
 //     */
-//    PP1_sp_I1P [n_init = 0, plot = True ];
+//    PP1_sp_I1P [N_init = 0, plot = True ];
 //    r_pp1sp_i1p_to_pp1SpI1p [ kf = "1e5", kb = 0.1 ];
 //    pp1_sp, I1P -> r_pp1sp_i1p_to_pp1SpI1p -> PP1_sp_I1P;
 //
@@ -93,7 +116,7 @@ compartment PSD {
     dt = 0.005
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 1000
+    sim_time = 12600
 }
 
 
