@@ -7,21 +7,16 @@ compartment PSD {
 
     // Volume of PSD in SI units.
     volume = "5e-21"
-
     
     /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
     
     * @note It's concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
     * which can go up to 1e-3 This is input to many reaction.
     */
-
-    //ca [ conc = "1e-4+1e-3*(t > 50 && t < 53 ?1:0)", plot = True ];
-    ca [ conc = "1e-4", plot = True ];
+    ca [ conc = "1e-4+1e-3*(t > 50 && t < 52 ?1:0)", plot = True ];
 
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
-    S [ N = 20, 
-        //plot = true 
-    ];
+    S [ N = 20, plot = true ];
 
     // CamKII molecules with 1 subunits of 6 subunits of ring phosporylated
     S1 [ N = 20, plot = true ];
