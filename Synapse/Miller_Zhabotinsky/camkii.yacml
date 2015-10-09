@@ -9,7 +9,6 @@ compartment PSD {
     volume = "5e-21"
     
     /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
-    
     * @note It's concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
     * which can go up to 1e-3 This is input to many reaction.
     */
@@ -28,83 +27,86 @@ compartment PSD {
     * @brief  Reaction phosphorylates one subunit of CaMKII. This is a fast
     * reaction. Within 2 seconds, almost all S turns into S1.
     *
-    *
-    * The rate constant kf of this equation is defined as v1 in paper.
-    *   v1 = K1(ca/KH1)^6 / (1+(ca/KH1)^3)^2 
-    *   KH1 = 0.7e-3 mole/m^3.
-    *   K1 = 1.5
-    *   NOTE: at basal [ca], v1 = 7.61e-5
-    *
-    * COMMENT FROM THE REFERENCE:
+    * REFERENCE:
     * At the resting Ca2+ concentration, with our standard parameters, the initial
     * autophosphorylation occurs at an average rate of one per 3.5 h per
     * unphosphorylated ring, while the further phosphorylation steps occur at
     * approximately one per 4 min per available “substrate” subunit
-
+    *
+    * NOTE: Following reations r_p0_p1 and r_p1_up kinetics matches that of
+    * given in reference. See redmine for more details.
+    *
+    * NOTE: at basal [ca], v1 = 7.61e-5
     */
 
     r_p0_p1 [ kf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
         kh1 = "0.7e-3", k1 = 1.5 ];
-    //S -> r_p0_p1 -> S1;
-
-    /* From one phosporylated unit of CamKII, this reaction phosporylates all
-     * other units. The phosporylated unit acts as auto-catalyst.
-     */
+    S -> r_p0_p1 -> S1;
 
     r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0, kh1 = "0.7e-3", k1 = 1.5 ];
     S1 -> r_p1_up -> Sp;
 
-//
-//    // Phosphatase enzype
-//    pp1 [ N_init = 20, plot = true ];
-//
-//    I1_free [ conc_init = "0.1e-3", constant = true, plot = true ];
-//
-//    I1P [ plot = true 
-//        , conc = "I1_free*(1+(ca/kh2)^3)/(ca/kh2)^3"
-//        , kh2 = "0.3e-3"
-//        , test_init = "conc AE 0.028;AH;0 0.1"
-//        ];
-//
-//    /*
-//       This reaction dephoshprylates up state into down state.
-//     */
-//
-//    // FIXME: For time being, disable the dephosphorylation step.
-//    pp1_sp [ N_init = 0, plot = true ];
-//
-//    r_pp1_sp_cplx [ kf = "10/km", km="0.4e3" kb = 0 ];
-//    pp1, Sp -> r_pp1_sp_cplx -> pp1_sp;
-//
-//    r_pp1_dephos [ kf = 10, kb = 0 ];
-//    pp1_sp -> r_pp1_dephos -> pp1, S;
-//
-//    /* NOTE: Another reaction r_alternate_pp1_dephos
-//
-//    This reaction can be used when rate of dephoshprylation v3 (in Miller paper)
-//    is known. It can theoretically be calculated to be 3e-3 to 3.5e-4. 
-//    Use it for comparision purpose.
-//    */
-//    r_alternate_pp1_dephos [ kf = "3e-3", kb = 0 ]
-//    Sp -> r_alternate_pp1_dephos -> S;
-//
-//    /* NOTE: Can't use this equivalent scheme since intermediates are used
-//    // elsewhere in model.
-//    //r_dephospho_enz [ enzyme = PP1, km = "0.4e-3", kcat = 10 ];
-//    //Sp -> r_dephospho_enz -> S;
-//    */
-//
-//    /*********************************************************************
-//     * PP1.Sp + I1P <----> PP1.Sp.I1P 
-//     * PP1.Sp ---> PP1 + S
-//     */
-//    PP1_sp_I1P [N_init = 0, plot = True ];
-//    r_pp1sp_i1p_to_pp1SpI1p [ kf = "1e5", kb = 0.1 ];
-//    pp1_sp, I1P -> r_pp1sp_i1p_to_pp1SpI1p -> PP1_sp_I1P;
-//
-//    /** TURNOVER term */
-//    r_pp1sp_dissoc [ kf = "9.26e-6", kb = 0 ];
-//    pp1_sp -> r_pp1sp_dissoc -> pp1, S;
+
+    /**
+    * @brief This is Protein Phosphatase 1 (PP1). This dephosphorylates Sp back
+    * to S. 
+    *
+    * Total number of PP1 in PSD are taken to be equal to S.
+    */
+    pp1 [ N_init = 20, plot = true ];
+
+    /**
+    * @brief I1 and I1_free are inhibitor-1.
+    * 
+    * NOTSURE: I1_free is free I1 in PSD. I1 -> I1_free is very fast and it can be
+    * assumend that I1_free is constant in PSD.
+    */
+    I1_free [ conc_init = "0.1e-3", constant = true, plot = true ];
+
+    /**
+    * @brief The phosphatase is deactivated by phosphorylated inhibitor-1 (I1P),
+    */
+    I1P [ plot = true 
+        , conc = "I1_free*(1+(ca/kh2)^3)/(ca/kh2)^3"
+        , kh2 = "0.3e-3"
+        //, test_init = "conc AE 0.028;AH;0 0.1"
+        ];
+
+    // FIXME: For time being, disable the dephosphorylation step.
+    pp1_sp [ N_init = 0, plot = true ];
+
+    r_pp1_sp_cplx [ kf = "10/km", km="0.4e3" kb = 0 ];
+    pp1, Sp -> r_pp1_sp_cplx -> pp1_sp;
+
+    r_pp1_dephos [ kf = 10, kb = 0 ];
+    pp1_sp -> r_pp1_dephos -> pp1, S;
+
+    /* NOTE: Another reaction r_alternate_pp1_dephos
+
+    This reaction can be used when rate of dephoshprylation v3 (in Miller paper)
+    is known. It can theoretically be calculated to be 3e-3 to 3.5e-4. 
+    Use it for comparision purpose.
+    */
+    r_alternate_pp1_dephos [ kf = "3e-3", kb = 0 ]
+    Sp -> r_alternate_pp1_dephos -> S;
+
+    /* NOTE: Can't use this equivalent scheme since intermediates are used
+    // elsewhere in model.
+    //r_dephospho_enz [ enzyme = PP1, km = "0.4e-3", kcat = 10 ];
+    //Sp -> r_dephospho_enz -> S;
+    */
+
+    /*********************************************************************
+     * PP1.Sp + I1P <----> PP1.Sp.I1P 
+     * PP1.Sp ---> PP1 + S
+     */
+    PP1_sp_I1P [N_init = 0, plot = True ];
+    r_pp1sp_i1p_to_pp1SpI1p [ kf = "1e5", kb = 0.1 ];
+    pp1_sp, I1P -> r_pp1sp_i1p_to_pp1SpI1p -> PP1_sp_I1P;
+
+    /** TURNOVER term */
+    r_pp1sp_dissoc [ kf = "9.26e-6", kb = 0 ];
+    pp1_sp -> r_pp1sp_dissoc -> pp1, S;
    
     /*
      * Simulation related
