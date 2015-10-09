@@ -19,10 +19,12 @@ compartment PSD {
     ca [ conc = "1e-4", plot = True ];
 
     // CamKII molecules with 0 subunits of 6 subunits of ring phosporylated.
-    S [ N = 20, plot = true ];
+    S [ N = 20, 
+        //plot = true 
+    ];
 
     // CamKII molecules with 1 subunits of 6 subunits of ring phosporylated
-    S1 [N_init = 0, plot = true ];
+    S1 [ N = 20, plot = true ];
 
     // All CamKII subunits are phosporylated
     Sp [ N_init = 0, plot = true  ];
@@ -48,15 +50,15 @@ compartment PSD {
 
     r_p0_p1 [ kf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
         kh1 = "0.7e-3", k1 = 1.5 ];
-    S -> r_p0_p1 -> S1;
+    //S -> r_p0_p1 -> S1;
 
-//    /* From one phosporylated unit of CamKII, this reaction phosporylates all
-//     * other units. The phosporylated unit acts as auto-catalyst.
-//     */
-//
-//    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0, kh1 = "0.7e-3", k1 = 1.5 ];
-//    S1 -> r_p1_up -> Sp;
-//
+    /* From one phosporylated unit of CamKII, this reaction phosporylates all
+     * other units. The phosporylated unit acts as auto-catalyst.
+     */
+
+    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0, kh1 = "0.7e-3", k1 = 1.5 ];
+    S1 -> r_p1_up -> Sp;
+
 //
 //    // Phosphatase enzype
 //    pp1 [ N_init = 20, plot = true ];
@@ -113,10 +115,10 @@ compartment PSD {
      * Simulation related
      */
     //solver = gsolve
-    dt = 0.005
+    dt = 0.001
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 12600
+    sim_time = 240
 }
 
 
