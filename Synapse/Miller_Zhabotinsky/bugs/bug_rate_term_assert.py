@@ -36,7 +36,7 @@ import moose.utils as mu
 compt = moose.CubeMesh('/compt')
 compt.volume = 1e-20
 
-molecules = [ "ca", "S", "S1", "Sp" ]
+molecules = [ 'ca', "S", "S1", "Sp" ]
 pools = {}
 tables = {}
 for m in molecules:
@@ -45,6 +45,7 @@ for m in molecules:
     tables[m] = t
     moose.connect(t, 'requestOut', pools[m], 'getConc')
 
+#pools['ca'] = moose.BufPool('/compt/ca')
 pools['ca'].nInit = 20
 
 r_p0_p1 = moose.Reac('/compt/reacA')
