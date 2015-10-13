@@ -1,0 +1,12 @@
+compartment psd {
+    volume = "1e-21";
+
+    b [ N = 20, plot = True ];
+    a_active [ conc = "sin(t)", plot = true ];
+    a_inactive [ N = "b-a_inactive", plot = True ];
+
+    // simulator
+    sim_dt = 0.005;
+    sim_time = 10.0;
+
+}
