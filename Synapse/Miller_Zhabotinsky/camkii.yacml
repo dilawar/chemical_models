@@ -12,7 +12,10 @@ compartment PSD {
     * @note Its concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
     * which can go up to 1e-3 This is input to many reaction.
     */
-    ca [ conc = "1e-4+1e-3*(t > 50 && t < 52 ?1:0)", plot = True ];
+    ca [ conc = "1e-4+1e-3*(t > 50 && t < 52 ?1:0)"
+        , constant = true
+        , plot = True 
+        ];
 
     // CamKII molecules with 0 subunits of total 6 subunits phosporylated.
     S [ N = 20, plot = true ];
@@ -53,9 +56,16 @@ compartment PSD {
     * @brief This is Protein Phosphatase 1 (PP1). This dephosphorylates Sp back
     * to S. 
     *
-    * TODO: cross-check; Total number of PP1 in PSD are taken to be equal to S.
+    * PP1 is deactivated by I1P. The fraction of PP1 which is active
+    * (PP1_active) is quite low. It has very high propensity of dephosphorylate
+    * Sp to S. The active concentration should be low for bistable switch to
+    * work.
     */
-    PP1 [ N = 20, plot = true ];
+    PP1 [ N = 20 ];
+    PP1_inactive [ N = "PP1-PP1_active" 
+        , plot = True 
+        //, constant = true
+        ];
 
     /**
     * @brief I1 and I1_free are Phosphatase Inhibitor-1.
@@ -66,7 +76,7 @@ compartment PSD {
     * between PSD and spine volume is rapid with tau <= 1 second, a timescale
     * much faster than that of phosphatase and kinase reactions.
     */
-    I1_free [ conc_init = "0.1e-3", constant = true, plot = true ];
+    I1_free [ conc = "0.1e-3" ];
 
     /**
     * @brief The phosphatase is deactivated by phosphorylated inhibitor-1 (I1P),
@@ -82,11 +92,10 @@ compartment PSD {
         ];
 
     /**
-    * @brief This much of I1P is active and free from inhibitor.
+    * @brief This much of PP1 is active and free from inhibitor.
     */
-    I1_active [ plot = true
-        , conc = "I1_free*k4/(k3*I1P+k4)", k4 = 0.1, k3="1e5"
-        , constant = true
+    PP1_active [ plot = true
+        , conc = "PP1_inactive*k4/(k3*I1P+k4)", k4 = 0.1, k3="1e5"
         ]
 
     
@@ -99,13 +108,14 @@ compartment PSD {
     */
     PP1Sp [ N = 0, plot = True];
     r_sp_pp1sp [ kf = "k2/km", kb = "0",  km = "0.4e-3", k2 = 10 ];
-    Sp, PP1 -> r_sp_pp1sp -> PP1Sp;
+    Sp, PP1_active -> r_sp_pp1sp -> PP1Sp;
 
     // PP1Sp turns into PP1 + S
     r_pp1sp_s [ kf = 10, kb = 0 ];
-    PP1Sp -> r_pp1sp_s -> PP1, S;
+    PP1Sp -> r_pp1sp_s -> PP1_active, S;
 
-   
+    // TODO: Turnover rate of PP1.Sp -> PP1
+
     /*
      * Simulation related
      */
@@ -113,5 +123,5 @@ compartment PSD {
     dt = 0.005
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 1200
+    sim_time = 200
 }
