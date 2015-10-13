@@ -12,20 +12,20 @@ compartment PSD {
     * @note Its concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
     * which can go up to 1e-3 This is input to many reaction.
     */
-    ca [ conc = "1e-4+1e-3*(t > 50 && t < 52 ?1:0)"
+    ca [ conc = "1e-4+1e-3*(t > 50 && t < 55 || t > 500 && t < 510 ?1:0)"
         , constant = true
         , plot = True 
         ];
 
     // CamKII molecules with 0 subunits of total 6 subunits phosporylated.
-    S [ N = 20, plot = true ];
+    S [ N = 20, plot = N ];
 
     // CamKII molecules with 1 subunits out of total 6 subunits of ring
     // phosporylated
-    S1 [ N = 0, plot = true ];
+    S1 [ N = 0, plot = N ];
 
     // CamKII molecule with all of its total 6 subunits phosporylated
-    Sp [ N_init = 0, plot = true  ];
+    Sp [ N_init = 0, plot = N  ];
 
     /**
     * @brief  Type: Reaction, Phosphorylates one subunit of CaMKII. This is a fast
@@ -63,8 +63,8 @@ compartment PSD {
     */
     PP1 [ N = 20 ]
     PP1_inactive [ N = "PP1-PP1_active" 
-        , plot = True 
-        , constant = true
+        //, plot = True 
+        //, constant = true
         ];
 
     /**
@@ -82,20 +82,23 @@ compartment PSD {
     * @brief The phosphatase is deactivated by phosphorylated inhibitor-1 (I1P),
     *
     * Its concentration is dependent on the value of I1_free. The stationary
-    * level of free I1P is given by equation 4 in reference.
+    * level of free I1P is given by equation 4 in reference where authors
+    * belives that they can write down the stationary level of I1P.
     */
-    I1P [ plot = true 
-        , conc = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
-        , kh2 = "0.3e-3",  vPKA = 1, vCaN = 1.0
-        , constant = true
+    I1P [ conc = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
+        , kh2 = "0.3e-3",  vPKA = 1, vCaN = 1
+        //, constant = true
         //, test_init = "conc AE 0.028;AH;0 0.1"
+         plot = conc
         ];
 
     /**
     * @brief This much of PP1 is active and free from inhibitor.
     */
+
     PP1_active [ plot = N
-        , conc = "PP1*k4/(k3*I1P+k4)", k4 = 0.1, k3="1e5"
+        , conc = "PP1/(1+k3*I1P/k4)", k4 = 0.1, k3="1e5"
+        , plot = N
         ]
 
     
@@ -107,14 +110,23 @@ compartment PSD {
     * PP1Sp
     */
     PP1Sp [ N = 0, plot = True];
-    r_sp_pp1sp [ kf = "k2/km", kb = "0",  km = "0.4e-3", k2 = 10 ];
+    r_sp_pp1sp [ kf = "k2/km", kb = 0,  km = "0.4e-3", k2 = 10 ];
     Sp, PP1_active -> r_sp_pp1sp -> PP1Sp;
 
     // PP1Sp turns into PP1 + S
     r_pp1sp_s [ kf = 10, kb = 0 ];
-    PP1Sp -> r_pp1sp_s -> PP1_active, S;
+    PP1Sp -> r_pp1sp_s -> PP1_inactive, S;
+
+    // I1P also make a complex with PP1Sp
+    r_i1p_pp1sp [ kf = "1e5", kb = 0.1]
+    PP1SpI1P [ N = 0
+        //, plot = N
+        ];
+    PP1Sp, I1P -> r_i1p_pp1sp -> PP1SpI1P;
 
     // TODO: Turnover rate of PP1.Sp -> PP1
+    r_turnover_sp [ kf = "1/108000", kb = 0];
+    PP1Sp -> r_turnover_sp -> PP1_active;
 
     /*
      * Simulation related
@@ -123,5 +135,5 @@ compartment PSD {
     dt = 0.005
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 200
+    sim_time = 1000
 }
