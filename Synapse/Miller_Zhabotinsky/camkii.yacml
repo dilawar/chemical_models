@@ -25,7 +25,7 @@ compartment PSD {
     S1 [ N = 0, plot = N ];
 
     // CamKII molecule with all of its total 6 subunits phosporylated
-    Sp [ N_init = 0, plot = N  ];
+    Sp [ N = 0, plot = N  ];
 
     /**
     * @brief  Type: Reaction, Phosphorylates one subunit of CaMKII. This is a fast
@@ -96,8 +96,7 @@ compartment PSD {
     * @brief This much of PP1 is active and free from inhibitor.
     */
 
-    PP1_active [ plot = N
-        , conc = "PP1/(1+k3*I1P/k4)", k4 = 0.1, k3="1e5"
+    PP1_active [  N = "PP1/(1+k3*I1P/k4)", k4 = 0.1, k3="1e5"
         , plot = N
         ]
 
@@ -115,7 +114,7 @@ compartment PSD {
 
     // PP1Sp turns into PP1 + S
     r_pp1sp_s [ kf = 10, kb = 0 ];
-    PP1Sp -> r_pp1sp_s -> PP1_inactive, S;
+    PP1Sp -> r_pp1sp_s -> PP1_active, S;
 
     // I1P also make a complex with PP1Sp
     r_i1p_pp1sp [ kf = "1e5", kb = 0.1]
@@ -135,5 +134,5 @@ compartment PSD {
     dt = 0.005
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 1000
+    sim_time = 7200
 }
