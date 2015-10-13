@@ -2,11 +2,11 @@ compartment psd {
     volume = "1e-21";
 
     b [ N = 30, plot = True ];
-    a_active [ N = "10*sin(t)", plot = true ];
+    a_active [ N = "10*(sin(t))", plot = true ];
     a_inactive [ N = "b-a_active", plot = True ];
 
     // simulator
-    sim_dt = 0.005;
+    sim_dt = 0.001
     sim_time = 10.0;
 
 }

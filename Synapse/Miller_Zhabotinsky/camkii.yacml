@@ -61,10 +61,10 @@ compartment PSD {
     * Sp to S. The active concentration should be low for bistable switch to
     * work.
     */
-    PP1 [ N = 20 ];
+    PP1 [ N = 20 ]
     PP1_inactive [ N = "PP1-PP1_active" 
         , plot = True 
-        //, constant = true
+        , constant = true
         ];
 
     /**
@@ -94,8 +94,8 @@ compartment PSD {
     /**
     * @brief This much of PP1 is active and free from inhibitor.
     */
-    PP1_active [ plot = true
-        , conc = "PP1_inactive*k4/(k3*I1P+k4)", k4 = 0.1, k3="1e5"
+    PP1_active [ plot = N
+        , conc = "PP1*k4/(k3*I1P+k4)", k4 = 0.1, k3="1e5"
         ]
 
     
