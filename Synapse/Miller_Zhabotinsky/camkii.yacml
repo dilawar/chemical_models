@@ -12,7 +12,7 @@ compartment PSD {
     * @note Its concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
     * which can go up to 1e-3 This is input to many reaction.
     */
-    ca [ conc = "1e-4+1e-3*(t > 50 && t < 55 || t > 500 && t < 510 ?1:0)"
+    ca [ conc = "1e-4+1e-3*(t > 50 && t < 51 ?1:0)"
         , constant = true
         , plot = True 
         ];
@@ -123,7 +123,9 @@ compartment PSD {
         ];
     PP1Sp, I1P -> r_i1p_pp1sp -> PP1SpI1P;
 
-    // TODO: Turnover rate of PP1.Sp -> PP1
+    /** 
+    * Turnover rate of PP1.Sp -> PP1
+    */
     r_turnover_sp [ kf = "1/108000", kb = 0];
     PP1Sp -> r_turnover_sp -> PP1_active;
 
@@ -134,5 +136,5 @@ compartment PSD {
     dt = 0.005
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 36000
+    sim_time = 2400
 }
