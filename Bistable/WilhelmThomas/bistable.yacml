@@ -1,4 +1,4 @@
-compartment a {
+compartment compt {
 
     volume = 1;
 
@@ -7,7 +7,7 @@ compartment a {
     X [ conc = 1, plot = conc ];
 
     Y [ conc = 1, plot = conc ];
-    P [ conc = 0, plot = conc ];
+    P [ conc_init = 0, plot = conc ];
 
     // k1 = 8, k2 = 1, k3 = 1, k4 = 1.5
     r1 [ kf = 8, kb = 0 ];
@@ -24,6 +24,6 @@ compartment a {
 
     solver = ksolve
     sim_dt = 0.005
-    sim_time = 100
+    sim_time = 500
 }
 
