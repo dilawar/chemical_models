@@ -1,0 +1,29 @@
+compartment a {
+
+    volume = 1;
+
+    // Species in system
+    S [ conc = "(t > 10 && t < 15) ? 1 : 2", plot = conc ];
+    X [ conc = 1, plot = conc ];
+
+    Y [ conc = 1, plot = conc ];
+    P [ conc = 0, plot = conc ];
+
+    // k1 = 8, k2 = 1, k3 = 1, k4 = 1.5
+    r1 [ kf = 8, kb = 0 ];
+    S, Y -> r1 -> X, X;
+
+    r2 [ kf = 1, kb = 0 ];
+    X, X -> r2 -> X, Y;
+
+    r3 [ kf = 1, kb = 0 ];
+    X, Y -> r3 -> Y, P;
+
+    r4 [ kf = 1.5, kb = 0 ];
+    X -> r4 -> P;
+
+    solver = ksolve
+    sim_dt = 0.005
+    sim_time = 100
+}
+
