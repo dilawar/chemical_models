@@ -12,7 +12,7 @@ compartment PSD {
     * @note Its concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
     * which can go up to 1e-3 This is input to many reaction.
     */
-    ca [ conc = "1e-4+1e-3*(t > 50 && t < 51 ?1:0)"
+    ca [ conc = "1e-4+1e-3*(t > 50 && t < 52 ?1:0)"
         , constant = true
         , plot = True 
         ];
@@ -44,8 +44,10 @@ compartment PSD {
     * PARAMETER: At basal level [ca], v1 = 7.61e-5
     */
 
-    r_p0_p1 [ kf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
-        kh1 = "0.7e-3", k1 = 1.5 ];
+    r_p0_p1 [ 
+        kf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2"
+        , kb = 0.0, kh1 = "0.7e-3", k1 = 1.5 
+        ];
     S -> r_p0_p1 -> S1;
 
     r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0, kh1 = "0.7e-3", k1 = 1.5 ];
@@ -96,11 +98,11 @@ compartment PSD {
     * @brief This much of PP1 is active and free from inhibitor.
     */
 
-    PP1_active [  N = "PP1/(1+k3*I1P/k4)", k4 = 0.1, k3="1e5"
+    PP1_active [  N = "PP1/(1+k3*I1P/k4)"
+        , k4 = 0.1, k3="1e5"
         , plot = N
         ]
 
-    
     /**
     * Now lets setup the dephosphorylation step.
     * PP1 quickly dephosphorylate Sp to S if there is no inhibition on the
@@ -136,5 +138,5 @@ compartment PSD {
     dt = 0.005
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 2400
+    sim_time = 1000
 }

@@ -1,9 +1,9 @@
 compartment psd {
     volume = "1e-21";
 
-    b [ N = 30, plot = True ];
-    a [ N = 30, plot = True ];
-    c [ N = 2, plot = True ];
+    b [ conc = 30, plot = True ];
+    a [ conc = 30, plot = True ];
+    c [ conc = 2, plot = True ];
 
     r_a [ kf = 5, kb = 5 ];
     a, b -> r_a -> c;
