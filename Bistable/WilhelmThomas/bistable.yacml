@@ -9,7 +9,7 @@ compartment compt {
         //conc = "(t > 10 && t < 15) ? 1:2", plot = conc 
     ];
 
-    X [ conc = 10, plot = conc ];
+    X [ conc = "10*sin(45)", plot = conc ];
 
     Y [ conc = 5, plot = conc ];
 
