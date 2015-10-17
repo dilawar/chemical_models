@@ -4,6 +4,7 @@ set -x
 MODEL_FILE="$1"
 IMAGE_DIR=./_images/`date +%F`
 FILE_NAME_TIMESTAMPED="$IMAGE_DIR/$MODEL_FILE_`date +%R`.png"
+dot -Tpng $MODEL_FILE.dot > $MODEL_FILE_top.png
 
 mkdir -p $IMAGE_DIR
 
