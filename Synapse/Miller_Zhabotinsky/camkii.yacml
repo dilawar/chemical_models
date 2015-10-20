@@ -12,13 +12,13 @@ compartment PSD {
     * @note Its concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
     * which can go up to 1e-3 This is input to many reaction.
     */
-    ca [ conc = "1e-4+1e-3*(t > 50 && t < 51 ?1:0)"
+    ca [ conc = "1e-4+0.8e-3*(t > 50 && t < 51 ?1:0)"
         , constant = true
         , plot = True 
         ];
 
     // CamKII molecules with 0 subunits of total 6 subunits phosporylated.
-    S [ N = 20, plot = N ];
+    S [ N = 30, plot = N ];
 
     // CamKII molecules with 1 subunits out of total 6 subunits of ring
     // phosporylated

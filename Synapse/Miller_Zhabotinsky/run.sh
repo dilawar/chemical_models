@@ -1,4 +1,5 @@
 #!/bin/bash
+export PYTHONPATH=$PYTHONPATH:$HOME/Work/GITHUB/YACML
 set -e
 set -x
 MODEL_FILE="$1"
