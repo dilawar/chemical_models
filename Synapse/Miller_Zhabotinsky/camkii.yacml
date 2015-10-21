@@ -13,12 +13,11 @@ compartment PSD {
     * which can go up to 1e-3 This is input to many reaction.
     */
     ca [ conc = "1e-4+0.8e-3*(t > 50 && t < 51 ?1:0)"
-        , constant = true
         , plot = True 
         ];
 
     // CamKII molecules with 0 subunits of total 6 subunits phosporylated.
-    S [ N = 30, plot = N ];
+    S [ N = 20, plot = N ];
 
     // CamKII molecules with 1 subunits out of total 6 subunits of ring
     // phosporylated
@@ -76,7 +75,7 @@ compartment PSD {
     * between PSD and spine volume is rapid with tau <= 1 second, a timescale
     * much faster than that of phosphatase and kinase reactions.
     */
-    I1_free [ conc = "0.1e-3" ];
+    I1_free [ conc = 0.0001 ];
 
     /**
     * @brief The phosphatase is deactivated by phosphorylated inhibitor-1 (I1P),
@@ -96,7 +95,7 @@ compartment PSD {
     * @brief This much of PP1 is active and free from inhibitor.
     */
 
-    PP1_active [  N = "PP1/(1+k3*I1P/k4)", k4 = 0.1, k3="1e5"
+    PP1_active [  N = "PP1/(1+(k3*I1P/k4))", k4 = 0.1, k3="1e5"
         , plot = N
         ]
 
@@ -114,7 +113,7 @@ compartment PSD {
 
     // PP1Sp turns into PP1 + S
     r_pp1sp_s [ kf = 10, kb = 0 ];
-    PP1Sp -> r_pp1sp_s -> PP1_active, S;
+    PP1Sp -> r_pp1sp_s -> PP1, S;
 
     // I1P also make a complex with PP1Sp
     r_i1p_pp1sp [ kf = "1e5", kb = 0.1]
@@ -127,7 +126,7 @@ compartment PSD {
     * Turnover rate of PP1.Sp -> PP1
     */
     r_turnover_sp [ kf = "1/108000", kb = 0];
-    PP1Sp -> r_turnover_sp -> PP1_active;
+    PP1Sp -> r_turnover_sp -> PP1;
 
     /*
      * Simulation related
