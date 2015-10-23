@@ -1,16 +1,30 @@
-/**
-* @brief Post Synaptic Density or PSD. This usually have volume in the range of
-* 1e6 cubic nano-meters.
+/** @brief Post Synaptic Density or PSD.  PSD acts as an isolated compartment.
+
+* [From ref] .. model depends critically on the fact that dephosphorylation of
+* CaMKII occurs specifically by the PP1 held in PSD by scaffolding proteins
+* (Shields et al., 1985; Allen et al., 1997; Nakanishi et al., 1997;
+* Hsieh-Wilson et al., 1999; MacMillan et al., 1999; Feng et al., 2000).
+* Remarkably, another phosphatase, PP2A, which can dephosphorylate soluble
+* CaMKII is somehow prevented from dephosphorylating CaMKII bound to PSD (Strack
+* et al., 1997b; Yoshimura et al., 1999). These findings indicate that the PSD
+* is an isolated biochemical compartment [See Lisman and Zhabotinsky].
+
+* 
+* This usually have volume in the range of 1e6 cubic nano-meters. See redmine
+* wiki for more details.
 */
+
 compartment PSD {
 
 
     // Volume of PSD in SI units.
-    volume = "1e-21"
+    volume = "5e-21"
     
     /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
     * @note Its concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
-    * which can go up to 1e-3 This is input to many reaction.
+    * which can go up to 1e-3.
+    *
+    * Calcium triggers various chemical pathways.
     */
     ca [ conc = "1e-4+0.8e-3*(t > 50 && t < 51 ?1:0)"
         , plot = True 
@@ -47,7 +61,8 @@ compartment PSD {
         kh1 = "0.7e-3", k1 = 1.5 ];
     S -> r_p0_p1 -> S1;
 
-    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0, kh1 = "0.7e-3", k1 = 1.5 ];
+    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0
+        , kh1 = "0.7e-3", k1 = 1.5 ];
     S1 -> r_p1_up -> Sp;
 
 
@@ -82,11 +97,11 @@ compartment PSD {
     *
     * Its concentration is dependent on the value of I1_free. The stationary
     * level of free I1P is given by equation 4 in reference where authors
-    * belives that they can write down the stationary level of I1P.
+    * belives that they can write down stationary level of I1P because
+    * reaction is fast.
     */
     I1P [ conc = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
         , kh2 = "0.3e-3",  vPKA = 1, vCaN = 1
-        //, constant = true
         //, test_init = "conc AE 0.028;AH;0 0.1"
          plot = conc
         ];
@@ -95,7 +110,7 @@ compartment PSD {
     * @brief This much of PP1 is active and free from inhibitor.
     */
 
-    PP1_active [  N = "PP1/(1+(k3*I1P/k4))", k4 = 0.1, k3="1e5"
+    PP1_active [ N = "PP1/(1+(k3*I1P/k4))", k4 = 0.1, k3="1e5"
         , plot = N
         ]
 
@@ -108,7 +123,8 @@ compartment PSD {
     * PP1Sp
     */
     PP1Sp [ N = 0, plot = True];
-    r_sp_pp1sp [ kf = "k2/km", kb = 0,  km = "0.4e-3", k2 = 10 ];
+    // kf = k2/km
+    r_sp_pp1sp [ kf = 250, kb = 0,  km = "0.4e-3", k2 = 10 ];
     Sp, PP1_active -> r_sp_pp1sp -> PP1Sp;
 
     // PP1Sp turns into PP1 + S
@@ -116,7 +132,7 @@ compartment PSD {
     PP1Sp -> r_pp1sp_s -> PP1, S;
 
     // I1P also make a complex with PP1Sp
-    r_i1p_pp1sp [ kf = "1e5", kb = 0.1]
+    r_i1p_pp1sp [ kf = 100000, kb = 0.1]
     PP1SpI1P [ N = 0
         //, plot = N
         ];
@@ -126,7 +142,7 @@ compartment PSD {
     * Turnover rate of PP1.Sp -> PP1
     */
     r_turnover_sp [ kf = "1/108000", kb = 0];
-    PP1Sp -> r_turnover_sp -> PP1;
+    PP1Sp -> r_turnover_sp -> PP1_active;
 
     /*
      * Simulation related
