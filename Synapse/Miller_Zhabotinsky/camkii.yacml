@@ -12,7 +12,8 @@ compartment PSD {
     * @note Its concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
     * which can go up to 1e-3 This is input to many reaction.
     */
-    ca [ conc = "1e-4+1e-3*(t > 50 && t < 51 ?1:0)"
+
+    ca [ conc = "10e-5+8e-4*(t > 1 && t <= 3 ?1:0)"
         , constant = true
         , plot = True 
         ];
@@ -36,7 +37,7 @@ compartment PSD {
     * At the resting Ca2+ concentration, with our standard parameters, the initial
     * autophosphorylation occurs at an average rate of one per 3.5 h per
     * unphosphorylated ring, while the further phosphorylation steps occur at
-    * approximately one per 4 min per available “substrate” subunit
+    * approximately one per 4 min per available “substrate” subunit.
     *
     * NOTE: Following reations r_p0_p1 and r_p1_up kinetics matches that of
     * given in reference. See REDMINE project page for more details.
@@ -44,11 +45,15 @@ compartment PSD {
     * PARAMETER: At basal level [ca], v1 = 7.61e-5
     */
 
-    r_p0_p1 [ kf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
-        kh1 = "0.7e-3", k1 = 1.5 ];
+    // DO NOT multiply with 6.
+    r_p0_p1 [ kf =  "k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
+        kh1 = "7e-4", k1 = 1.5 
+        ];
     S -> r_p0_p1 -> S1;
 
-    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0, kh1 = "0.7e-3", k1 = 1.5 ];
+    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0
+        , kh1 = "7e-4", k1 = 1.5 
+        ];
     S1 -> r_p1_up -> Sp;
 
 
@@ -86,7 +91,8 @@ compartment PSD {
     * belives that they can write down the stationary level of I1P.
     */
     I1P [ conc = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
-        , kh2 = "0.3e-3",  vPKA = 1, vCaN = 1
+        , kh2 = "0.3e-3"
+        ,  vPKA = 1, vCaN = 1
         , constant = true
         //, test_init = "conc AE 0.028;AH;0 0.1"
          plot = conc
@@ -96,9 +102,11 @@ compartment PSD {
     * @brief This much of PP1 is active and free from inhibitor.
     */
 
-    PP1_active [  N = "PP1/(1+k3*I1P/k4)", k4 = 0.1, k3="1e5"
+    PP1_active [  N = "PP1/(1+k3*I1P/k4)"
+        , k4 = 0.1
+        , k3="1e5"
         , plot = N
-        ]
+        ];
 
     
     /**
@@ -132,9 +140,10 @@ compartment PSD {
     /*
      * Simulation related
      */
-    solver = gsolve
-    dt = 0.005
+    //solver = gsolve
+    //dt = 0.05
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 3000
+    sim_time = 2400
+
 }

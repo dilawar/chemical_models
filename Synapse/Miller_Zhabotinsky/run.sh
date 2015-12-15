@@ -55,7 +55,7 @@ done
 
 shift $(($OPTIND-1))
 
-export PYTHONPATH=$HOME/Work/GITHUB/DILAWAR/moose-core/python
+#export PYTHONPATH=$HOME/Work/GITHUB/DILAWAR/moose-core/python
 echo "Using moose: `python -c 'import moose; print moose.__file__'`"
 
 PYTHON=`which python`
