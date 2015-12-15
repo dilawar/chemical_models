@@ -132,7 +132,7 @@ compartment PSD {
     /*
      * Simulation related
      */
-    //solver = gsolve
+    solver = gsolve
     dt = 0.005
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
