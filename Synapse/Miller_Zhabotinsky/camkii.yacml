@@ -87,7 +87,7 @@ compartment PSD {
     */
     I1P [ conc = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
         , kh2 = "0.3e-3",  vPKA = 1, vCaN = 1
-        //, constant = true
+        , constant = true
         //, test_init = "conc AE 0.028;AH;0 0.1"
          plot = conc
         ];
@@ -136,5 +136,5 @@ compartment PSD {
     dt = 0.005
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 2400
+    sim_time = 3000
 }

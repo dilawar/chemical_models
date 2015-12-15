@@ -1,7 +1,14 @@
 #!/bin/bash
 set -e
 set -x
+export PYTHONPATH=$HOME/Work/GITHUB/DILAWAR/moose-core/python
+echo "Using PYTHONPATH : $PYTHONPATH"
 MODEL_FILE="$1"
+if [ ! -f "$MODEL_FILE" ]; then
+    echo "File $MODEL_FILE not found"
+    exit
+fi
+
 IMAGE_DIR=./_images/`date +%F`
 FILE_NAME_TIMESTAMPED="$IMAGE_DIR/$MODEL_FILE_`date +%R`.png"
 
