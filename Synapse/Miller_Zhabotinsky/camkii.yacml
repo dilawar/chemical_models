@@ -133,9 +133,13 @@ compartment PSD {
 
     /** 
     * Turnover rate of PP1.Sp -> PP1
+    * New holoenzyme is added to system one molecule per 30 hours. When the
+    * switch is ON, this rate is significantly higher than the rate of
+    * phosphorylation by basal Ca++ (approxy 3.5 hours) i.e. the new molecule
+    * with turn ON by basal Ca++ thus keeping the switch ON.
     */
     r_turnover_sp [ kf = "1/108000", kb = 0];
-    PP1Sp -> r_turnover_sp -> PP1_active;
+    PP1Sp -> r_turnover_sp -> PP1_active, S;
 
     /*
      * Simulation related
@@ -144,6 +148,9 @@ compartment PSD {
     //dt = 0.05
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 2400
+    sim_time = 240000
+
+    /* For a year simulation, I might see some some bistability */
+    //sim_time = 31536000
 
 }
