@@ -63,7 +63,7 @@ digraph PSD {
     * Sp to S. The active concentration should be low for bistable switch to
     * work.
     */
-    PP1 [ N = 20, constant = True, plot = N ]
+    PP1 [ N = 20, constant = True ]
 
     /**
     * @brief I1 and I1_free are Phosphatase Inhibitor-1.
@@ -93,11 +93,9 @@ digraph PSD {
     /**
     * @brief This much of PP1 is active and free from inhibitor.
     */
-
-    PP1_active [  N = "PP1/(1+k3*I1P/k4)"
-        , k4 = 0.1
-        , k3="100"
-        , plot = N
+    PP1_active [  N = "PP1/(1+(k3*I1P)/k4)" , k4 = 0.1
+        , k3="(100/(1e-3*volume*6.023e23))"  // This fixes the setN problem.
+        , plot = N 
         ];
 
     
