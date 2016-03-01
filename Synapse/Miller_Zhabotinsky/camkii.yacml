@@ -5,7 +5,7 @@
 digraph PSD {
 
     // Volume of PSD in SI units.
-    volume = "3e-20"
+    volume = "1e-20"
     AV = "6.023e23"                 // Avagadro Number
     
     /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
@@ -18,7 +18,7 @@ digraph PSD {
 
     // CamKII molecules with x subunits of total 6 subunits phosporylated, and y
     // PP1 units are attached  to it.
-    x0y0 [ N = 10, plot = N ];
+    x0y0 [ N = 20, plot = N ];
     x1y0 [ N = 0 ]
     x6y0 [ N = 0, plot = N ];
     x2y0, x3y0, x3y0, x4y0, x5y0 [ N = 0 ];
@@ -33,7 +33,7 @@ digraph PSD {
     * Sp to S. The active concentration should be low for bistable switch to
     * work.
     */
-    PP1 [ N = 10, constant = True ]
+    PP1 [ N = 20, constant = True ]
 
     /**
     * @brief  Type: Reaction, Phosphorylates one subunit of CaMKII. This is a fast
@@ -94,7 +94,7 @@ digraph PSD {
     */
     PP1_active [  N = "PP1/(1+(k3*I1P)/k4)" 
         , k4 = 0.1
-        , k3="(100/(1e-3*volume*AV))"  // This fixes the setN problem.
+        , k3="(100000/(volume*AV))"  // This fixes the setN problem.
         , plot = N 
         ];
 
