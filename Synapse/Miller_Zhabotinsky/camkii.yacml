@@ -5,7 +5,8 @@
 digraph PSD {
 
     // Volume of PSD in SI units.
-    volume = "1e-20"
+    volume = "3e-20"
+    AV = "6.023e23"                 // Avagadro Number
     
     /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
     * @note Its concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
@@ -15,15 +16,24 @@ digraph PSD {
     //ca [ conc = "1e-4+1e-3*(t > 1000 && t <= 1010 ?1:0)" , plot = True ];
     ca  [ conc = "1e-4", plot = conc ]
 
-    // CamKII molecules with 0 subunits of total 6 subunits phosporylated.
-    S [ N = 20, plot = N ];
+    // CamKII molecules with x subunits of total 6 subunits phosporylated, and y
+    // PP1 units are attached  to it.
+    x0y0 [ N = 10, plot = N ];
+    x1y0 [ N = 0 ]
+    x6y0 [ N = 0, plot = N ];
+    x2y0, x3y0, x3y0, x4y0, x5y0 [ N = 0 ];
 
-    // CamKII molecules with 1 subunits out of total 6 subunits of ring
-    // phosporylated
-    S1 [ N = 0, plot = N ];
 
-    // CamKII molecule with all of its total 6 subunits phosporylated
-    Sp [ N = 0, plot = N  ];
+    /**
+    * @brief This is Protein Phosphatase 1 (PP1). This dephosphorylates Sp back
+    * to S. 
+    *
+    * PP1 is deactivated by I1P. The fraction of PP1 which is active
+    * (PP1_active) is quite low. It has very high propensity of dephosphorylate
+    * Sp to S. The active concentration should be low for bistable switch to
+    * work.
+    */
+    PP1 [ N = 10, constant = True ]
 
     /**
     * @brief  Type: Reaction, Phosphorylates one subunit of CaMKII. This is a fast
@@ -43,27 +53,16 @@ digraph PSD {
     */
 
     // DO NOT multiply with 6.
-    r_p0_p1 [ numKf =  "k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", numKb = 0.0 
-        kh1 = "(7e-4*volume*6.023e23)", k1 = 1.5 
+    r_p0_p1 [ numKf =  "k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2"
+        , kh1 = "(7e-4*volume*AV)"
+        , k1 = 1.5 
         ];
-    S -> r_p0_p1 -> S1;
+    x0y0 -> r_p0_p1 -> x1y0;
 
-    r_p1_up [ numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", numKb = 0.0
-        , kh1 = "7e-4*volume*6.023e23", k1 = 1.5 
+    r_p1_up [ numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)"
+        , kh1 = "7e-4*volume*AV", k1 = 1.5 
         ];
-    S1 -> r_p1_up -> Sp;
-
-
-    /**
-    * @brief This is Protein Phosphatase 1 (PP1). This dephosphorylates Sp back
-    * to S. 
-    *
-    * PP1 is deactivated by I1P. The fraction of PP1 which is active
-    * (PP1_active) is quite low. It has very high propensity of dephosphorylate
-    * Sp to S. The active concentration should be low for bistable switch to
-    * work.
-    */
-    PP1 [ N = 20, constant = True ]
+    x1y0 -> r_p1_up -> x6y0;
 
     /**
     * @brief I1 and I1_free are Phosphatase Inhibitor-1.
@@ -84,7 +83,7 @@ digraph PSD {
     * belives that they can write down the stationary level of I1P.
     */
     I1P [ N = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
-        , kh2 = "(0.3e-3*6.023e23*volume)"
+        , kh2 = "(0.3e-3*AV*volume)"
         , vPKA = 1, vCaN = 1
         //, test_init = "conc AE 0.028;AH;0 0.1"
          plot = N
@@ -93,34 +92,28 @@ digraph PSD {
     /**
     * @brief This much of PP1 is active and free from inhibitor.
     */
-    PP1_active [  N = "PP1/(1+(k3*I1P)/k4)" , k4 = 0.1
-        , k3="(100/(1e-3*volume*6.023e23))"  // This fixes the setN problem.
+    PP1_active [  N = "PP1/(1+(k3*I1P)/k4)" 
+        , k4 = 0.1
+        , k3="(100/(1e-3*volume*AV))"  // This fixes the setN problem.
         , plot = N 
         ];
 
-    
-//    /**
-//    * Now lets setup the dephosphorylation step.
-//    * PP1 quickly dephosphorylate Sp to S if there is no inhibition on the
-//    * activity of PP1.
-//    * The dephosphorylation happens in two stages, with intermediate complex
-//    * PP1Sp
-//    */
-//    PP1Sp [ N = 0, plot = True];
-//    r_sp_pp1sp [ kf = "k2/km", kb = 0,  km = "0.4e-3", k2 = 10 ];
-//    Sp, PP1_active -> r_sp_pp1sp -> PP1Sp;
-//
-//    // PP1Sp turns into PP1 + S
-//    r_pp1sp_s [ kf = 10, kb = 0 ];
-//    PP1Sp -> r_pp1sp_s -> PP1_active, S;
-//
-//    // I1P also make a complex with PP1Sp
-//    r_i1p_pp1sp [ kf = "1e5", kb = 0.1]
-//    PP1SpI1P [ N = 0
-//        //, plot = N
-//        ];
-//    PP1Sp, I1P -> r_i1p_pp1sp -> PP1SpI1P;
-//
+    /**
+    * Now lets setup the dephosphorylation step.
+    * PP1 quickly dephosphorylate Sp to S if there is no inhibition on the
+    * activity of PP1.
+    * The dephosphorylation happens in two stages, with intermediate complex
+    * PP1Sp
+    */
+    PP1Sp [ N = 0, plot = True];
+    r_sp_pp1sp [ numKf = "k2/km",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    x6y0, PP1_active -> r_sp_pp1sp -> PP1Sp;
+
+    // PP1Sp turns into PP1 + S
+    r_pp1sp_s [ kf = 10, kb = 0 ];
+    PP1Sp -> r_pp1sp_s -> PP1_active, x0y0;
+
+
 //    /** 
 //    * Turnover rate of PP1.Sp -> PP1
 //    * New holoenzyme is added to system one molecule per 30 hours. When the
@@ -134,12 +127,13 @@ digraph PSD {
     /*
      * Simulation related
      */
+
     solver = gsolve
     dt = 0.05
-    plot_dt = 10
+    plot_dt = 30
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 24000
+    sim_time = 240000
 
     /* For a year simulation, I might see some some bistability */
     //sim_time = 31536000
