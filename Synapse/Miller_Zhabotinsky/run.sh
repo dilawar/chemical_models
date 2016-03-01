@@ -55,7 +55,7 @@ done
 
 shift $(($OPTIND-1))
 
-#export PYTHONPATH=$HOME/Work/GITHUB/DILAWAR/moose-core/python
+export PYTHONPATH=$HOME/Work/GITHUB/DILAWAR/moose-core/python
 echo "Using moose: `python -c 'import moose; print moose.__file__'`"
 
 PYTHON=`which python`
@@ -64,8 +64,11 @@ if [ $DO_DEBUG ];  then
     PYTHON="gdb -ex r --args $PYTHON"
 fi
 
+MODEL_FILE="$1"
+
 if [ ! -f "$MODEL_FILE" ]; then
-    echo "File $MODEL_FILE not found"
+    echo "File $MODEL_FILE not found or no model file given"
+    echo "Usage: $0 yacml_file"
     exit
 fi
 
@@ -78,7 +81,7 @@ $PYTHON ./run_model.py "$MODEL_FILE"
 
 # Plot only if not in debug mode.
 if [ ! $DO_DEBUG ]; then 
-    ~/Scripts/plot_csv.py -i "$MODEL_FILE".dat -y 1-10 -s -o $MODEL_FILE.png
+    ~/Scripts/plot_csv.py -i "$MODEL_FILE".dat -y "ca.conc" -s -o $MODEL_FILE.png
     echo "Copying image to $FILE_NAME_TIMESTAMPED"
     cp $MODEL_FILE.png $FILE_NAME_TIMESTAMPED
 fi

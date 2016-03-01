@@ -2,7 +2,7 @@
 * @brief Post Synaptic Density or PSD. This usually have volume in the range of
 * 1e6 cubic nano-meters.
 */
-compartment PSD {
+digraph PSD {
 
 
     // Volume of PSD in SI units.
@@ -46,109 +46,109 @@ compartment PSD {
     */
 
     // DO NOT multiply with 6.
-    r_p0_p1 [ kf =  "k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
-        kh1 = "7e-4", k1 = 1.5 
-        ];
-    S -> r_p0_p1 -> S1;
+//    r_p0_p1 [ kf =  "k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2", kb = 0.0 
+//        kh1 = "7e-4", k1 = 1.5 
+//        ];
+//    S -> r_p0_p1 -> S1;
+//
+//    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0
+//        , kh1 = "7e-4", k1 = 1.5 
+//        ];
+//    S1 -> r_p1_up -> Sp;
+//
 
-    r_p1_up [ kf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)", kb = 0.0
-        , kh1 = "7e-4", k1 = 1.5 
-        ];
-    S1 -> r_p1_up -> Sp;
-
-
-    /**
-    * @brief This is Protein Phosphatase 1 (PP1). This dephosphorylates Sp back
-    * to S. 
-    *
-    * PP1 is deactivated by I1P. The fraction of PP1 which is active
-    * (PP1_active) is quite low. It has very high propensity of dephosphorylate
-    * Sp to S. The active concentration should be low for bistable switch to
-    * work.
-    */
-    PP1 [ N = 20 ]
-    PP1_inactive [ N = "PP1-PP1_active" 
-        //, plot = True 
-        //, constant = true
-        ];
-
-    /**
-    * @brief I1 and I1_free are Phosphatase Inhibitor-1.
-    * 
-    * NOTSURE: I1_free is free I1 in PSD. I1 -> I1_free is very fast and it can be
-    * assumend that I1_free is constant in PSD (REF value 0.1 uM). Usually
-    * number of I1 in PSD is very small (less than 1). The exchange of I1
-    * between PSD and spine volume is rapid with tau <= 1 second, a timescale
-    * much faster than that of phosphatase and kinase reactions.
-    */
-    I1_free [ conc = "0.1e-3" ];
-
-    /**
-    * @brief The phosphatase is deactivated by phosphorylated inhibitor-1 (I1P),
-    *
-    * Its concentration is dependent on the value of I1_free. The stationary
-    * level of free I1P is given by equation 4 in reference where authors
-    * belives that they can write down the stationary level of I1P.
-    */
-    I1P [ conc = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
-        , kh2 = "0.3e-3"
-        ,  vPKA = 1, vCaN = 1
-        , constant = true
-        //, test_init = "conc AE 0.028;AH;0 0.1"
-         plot = conc
-        ];
-
-    /**
-    * @brief This much of PP1 is active and free from inhibitor.
-    */
-
-    PP1_active [  N = "PP1/(1+k3*I1P/k4)"
-        , k4 = 0.1
-        , k3="1e5"
-        , plot = N
-        ];
-
-    
-    /**
-    * Now lets setup the dephosphorylation step.
-    * PP1 quickly dephosphorylate Sp to S if there is no inhibition on the
-    * activity of PP1.
-    * The dephosphorylation happens in two stages, with intermediate complex
-    * PP1Sp
-    */
-    PP1Sp [ N = 0, plot = True];
-    r_sp_pp1sp [ kf = "k2/km", kb = 0,  km = "0.4e-3", k2 = 10 ];
-    Sp, PP1_active -> r_sp_pp1sp -> PP1Sp;
-
-    // PP1Sp turns into PP1 + S
-    r_pp1sp_s [ kf = 10, kb = 0 ];
-    PP1Sp -> r_pp1sp_s -> PP1_active, S;
-
-    // I1P also make a complex with PP1Sp
-    r_i1p_pp1sp [ kf = "1e5", kb = 0.1]
-    PP1SpI1P [ N = 0
-        //, plot = N
-        ];
-    PP1Sp, I1P -> r_i1p_pp1sp -> PP1SpI1P;
-
-    /** 
-    * Turnover rate of PP1.Sp -> PP1
-    * New holoenzyme is added to system one molecule per 30 hours. When the
-    * switch is ON, this rate is significantly higher than the rate of
-    * phosphorylation by basal Ca++ (approxy 3.5 hours) i.e. the new molecule
-    * with turn ON by basal Ca++ thus keeping the switch ON.
-    */
-    r_turnover_sp [ kf = "1/108000", kb = 0];
-    PP1Sp -> r_turnover_sp -> PP1_active, S;
+//    /**
+//    * @brief This is Protein Phosphatase 1 (PP1). This dephosphorylates Sp back
+//    * to S. 
+//    *
+//    * PP1 is deactivated by I1P. The fraction of PP1 which is active
+//    * (PP1_active) is quite low. It has very high propensity of dephosphorylate
+//    * Sp to S. The active concentration should be low for bistable switch to
+//    * work.
+//    */
+//    PP1 [ N = 20 ]
+//    PP1_inactive [ N = "PP1-PP1_active" 
+//        //, plot = True 
+//        //, constant = true
+//        ];
+//
+//    /**
+//    * @brief I1 and I1_free are Phosphatase Inhibitor-1.
+//    * 
+//    * NOTSURE: I1_free is free I1 in PSD. I1 -> I1_free is very fast and it can be
+//    * assumend that I1_free is constant in PSD (REF value 0.1 uM). Usually
+//    * number of I1 in PSD is very small (less than 1). The exchange of I1
+//    * between PSD and spine volume is rapid with tau <= 1 second, a timescale
+//    * much faster than that of phosphatase and kinase reactions.
+//    */
+//    I1_free [ conc = "0.1e-3" ];
+//
+//    /**
+//    * @brief The phosphatase is deactivated by phosphorylated inhibitor-1 (I1P),
+//    *
+//    * Its concentration is dependent on the value of I1_free. The stationary
+//    * level of free I1P is given by equation 4 in reference where authors
+//    * belives that they can write down the stationary level of I1P.
+//    */
+//    I1P [ conc = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
+//        , kh2 = "0.3e-3"
+//        ,  vPKA = 1, vCaN = 1
+//        , constant = true
+//        //, test_init = "conc AE 0.028;AH;0 0.1"
+//         plot = conc
+//        ];
+//
+//    /**
+//    * @brief This much of PP1 is active and free from inhibitor.
+//    */
+//
+//    PP1_active [  N = "PP1/(1+k3*I1P/k4)"
+//        , k4 = 0.1
+//        , k3="1e5"
+//        , plot = N
+//        ];
+//
+//    
+//    /**
+//    * Now lets setup the dephosphorylation step.
+//    * PP1 quickly dephosphorylate Sp to S if there is no inhibition on the
+//    * activity of PP1.
+//    * The dephosphorylation happens in two stages, with intermediate complex
+//    * PP1Sp
+//    */
+//    PP1Sp [ N = 0, plot = True];
+//    r_sp_pp1sp [ kf = "k2/km", kb = 0,  km = "0.4e-3", k2 = 10 ];
+//    Sp, PP1_active -> r_sp_pp1sp -> PP1Sp;
+//
+//    // PP1Sp turns into PP1 + S
+//    r_pp1sp_s [ kf = 10, kb = 0 ];
+//    PP1Sp -> r_pp1sp_s -> PP1_active, S;
+//
+//    // I1P also make a complex with PP1Sp
+//    r_i1p_pp1sp [ kf = "1e5", kb = 0.1]
+//    PP1SpI1P [ N = 0
+//        //, plot = N
+//        ];
+//    PP1Sp, I1P -> r_i1p_pp1sp -> PP1SpI1P;
+//
+//    /** 
+//    * Turnover rate of PP1.Sp -> PP1
+//    * New holoenzyme is added to system one molecule per 30 hours. When the
+//    * switch is ON, this rate is significantly higher than the rate of
+//    * phosphorylation by basal Ca++ (approxy 3.5 hours) i.e. the new molecule
+//    * with turn ON by basal Ca++ thus keeping the switch ON.
+//    */
+//    r_turnover_sp [ kf = "1/108000", kb = 0];
+//    PP1Sp -> r_turnover_sp -> PP1_active, S;
 
     /*
      * Simulation related
      */
-    //solver = gsolve
+    solver = gsolve
     //dt = 0.05
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 240000
+    sim_time = 24000
 
     /* For a year simulation, I might see some some bistability */
     //sim_time = 31536000
