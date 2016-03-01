@@ -73,7 +73,7 @@ if [ ! -f "$MODEL_FILE" ]; then
 fi
 
 IMAGE_DIR=./_images/`date +%F`
-FILE_NAME_TIMESTAMPED="$IMAGE_DIR/$MODEL_FILE_`date +%R`.png"
+FILE_NAME_TIMESTAMPED="$IMAGE_DIR/$MODEL_FILE_`date +%R`"
 
 mkdir -p $IMAGE_DIR
 
@@ -81,7 +81,7 @@ $PYTHON ./run_model.py "$MODEL_FILE"
 
 # Plot only if not in debug mode.
 if [ ! $DO_DEBUG ]; then 
-    ~/Scripts/plot_csv.py -i "$MODEL_FILE".dat -y "ca.conc" -s -o $MODEL_FILE.png
-    echo "Copying image to $FILE_NAME_TIMESTAMPED"
-    cp $MODEL_FILE.png $FILE_NAME_TIMESTAMPED
+    ~/Scripts/plot_csv.py -i "$MODEL_FILE".dat -y 1:10 -s -o $MODEL_FILE.svg
+    echo "Copying image to $FILE_NAME_TIMESTAMPED".svg
+    cp $MODEL_FILE.svg $FILE_NAME_TIMESTAMPED.svg
 fi
