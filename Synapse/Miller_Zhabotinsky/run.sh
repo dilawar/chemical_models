@@ -42,6 +42,7 @@ do
             ;;
 
         d|debug  )  
+            echo "in debug mode"
             DO_DEBUG=1;
             ;;
 
@@ -81,12 +82,12 @@ $PYTHON ./run_model.py "$MODEL_FILE"
 
 #-y 1:20 \
 # Plot only if not in debug mode.
-rm -f "$MODEL_FILE.svg"
+rm -f "$MODEL_FILE.png"
 if [ ! $DO_DEBUG ]; then 
     ~/Scripts/plot_csv.py -i "$MODEL_FILE".dat \
-        -y "PP1.N,PP1.conc,x0y0.N,x1y0.N,x1y1.N,x3y0,x6y0.N,ca.conc" \
-        -s -o $MODEL_FILE.svg
-    echo "Copying image to $FILE_NAME_TIMESTAMPED".svg
-    cp $MODEL_FILE.svg $FILE_NAME_TIMESTAMPED.svg
+        -y "PP1.N,PP1.conc,x0.N,x6.N,ca.conc" \
+        -s -o $MODEL_FILE.png
+    echo "Copying image to $FILE_NAME_TIMESTAMPED".png
+    cp $MODEL_FILE.png $FILE_NAME_TIMESTAMPED.png
     dot -Tpng ./camkii.yacml.dot > camkii.png
 fi

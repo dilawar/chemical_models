@@ -5,7 +5,7 @@
 compartment PSD {
 
     // Volume of PSD in SI units.
-    volume = "1e-20";
+    volume = "3e-20";
     AV = "6.023e23";               // Avagadro Number
     
     /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
@@ -13,29 +13,28 @@ compartment PSD {
     * which can go up to 1e-3 This is input to many reaction.
     */
 
-    //ca [ conc = "1e-4+1e-3*(t > 1000 && t <= 1010 ?1:0)" , plot = True ];
-    ca  [ conc = "1e-4", plot = conc ];
+    ca [ conc = "1e-4+1e-3*(t > 1000 && t <= 1010 ?1:0)" , plot = True ];
+    //ca  [ conc = "(cos(t)>=0.98)?(2e-4):(1e-4)", plot = conc ];
+    //ca [ conc = "1e-4", plot = conc ];
 
     // CamKII molecules with x subunits of total 6 subunits phosporylated, and y
     // PP1 units are attached  to it.
-    x0y0 [N = 20, plot = N ];
-
-    x1y0 [N = 0, plot = N]; 
-    x2y0 [N = 0, plot = N]; 
-    x3y0 [N = 0, plot = N]; 
-    x4y0 [N = 0, plot = N]; 
-    x5y0 [N = 0, plot = N];
-
-    x6y0 [N = 0, plot = N ];
+    x0 [N = 20, plot = N];
+    x1 [N = 0, plot = N]; 
+    x2 [N = 0, plot = N]; 
+    x3 [N = 0, plot = N]; 
+    x4 [N = 0, plot = N]; 
+    x5 [N = 0, plot = N];
+    x6 [N = 0, plot = N];
 
     // When a PP1 attach to above configuration, I get the following potential
     // states. I can also have x1y2, x1y3 etc...
-    x1y1 [N=0 plot = N]
-    x2y1[N=0, plot = N]
-    x3y1[N=0, plot = N]
-    x4y1[N=0, plot = N]
-    x5y1[N=0, plot = N]
-    x6y1[N=0, plot = N]
+    x1P[N=0, plot = N]
+    x2P[N=0, plot = N]
+    x3P[N=0, plot = N]
+    x4P[N=0, plot = N]
+    x5P[N=0, plot = N]
+    x6P[N=0, plot = N]
 
     /**
     * @brief This is Protein Phosphatase 1 (PP1). This dephosphorylates Sp back
@@ -66,20 +65,23 @@ compartment PSD {
     */
 
     // DO NOT multiply with 6.
-    r_p0_p1 [ numKb = 0, numKf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
-    x0y0 -> r_p0_p1 -> x1y0;
+    r_0to1 [ numKb = 0, numKf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    x0 -> r_0to1 -> x1;
 
-    r_x1y0_x2y0 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
-    r_x2y0_x3y0 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
-    r_x3y0_x4y0 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
-    r_x4y0_x5y0 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
-    r_x5y0_x6y0 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x1_x2 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    x1 -> r_x1_x2 -> x2;
 
-    x1y0 -> r_x1y0_x2y0 -> x2y0;
-    x2y0 -> r_x2y0_x3y0 -> x3y0;
-    x3y0 -> r_x3y0_x4y0 -> x4y0; 
-    x4y0 -> r_x4y0_x5y0 -> x5y0; 
-    x5y0 -> r_x5y0_x6y0 -> x6y0;
+    r_x2_x3 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    x2 -> r_x2_x3 -> x3;
+
+    r_x3_x4 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    x3 -> r_x3_x4 -> x4; 
+
+    r_x4_x5 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    x4 -> r_x4_x5 -> x5; 
+
+    r_x5_x6 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    x5 -> r_x5_x6 -> x6;
 
     /**
     * @brief I1 and I1_free are Phosphatase Inhibitor-1.
@@ -106,8 +108,13 @@ compartment PSD {
         plot = N
         ];
 
+
+    /**
+    * @brief I1P inhibits PP1. 
+    * Larger value of numKf in reactions r_i1p_pp1_cplx increases the likelyhood
+    * of PP1 saturation which in turns make ON system more stable.
+    */
     I1P_PP1 [ N = 0 ];
-    /* I1P inhibits PP1 */
     r_i1p_pp1_cplx [ numKf = "100e3/(volume*AV)", numKb = 0.1 ];
     I1P, PP1 -> r_i1p_pp1_cplx -> I1P_PP1;
 
@@ -119,60 +126,54 @@ compartment PSD {
     * PP1Sp
     */
 
-    r_x1y0_x1y1 [ numKb = 0.0, numKf = "k2/km",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x2y0_x2y1 [ numKb = 0.0, numKf = "k2/km",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x3y0_x3y1 [ numKb = 0.0, numKf = "4*k2/km",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x4y0_x4y1 [ numKb = 0.0, numKf = "k2/km",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x5y0_x5y1 [ numKb = 0.0, numKf = "k2/km",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x6y0_x6y1 [ numKb = 0.0, numKf = "k2/km",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x1_x1P [ numKb = 0.0, numKf = "(k2/km)/6",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x2_x2P [ numKb = 0.0, numKf = "(k2/km)/5",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x3_x3P [ numKb = 0.0, numKf = "(k2/km)/4",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x4_x4P [ numKb = 0.0, numKf = "(k2/km)/3",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x5_x5P [ numKb = 0.0, numKf = "(k2/km)/2",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x6_x6P [ numKb = 0.0, numKf = "(k2/km)/1",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
 
-    PP1, x1y0 -> r_x1y0_x1y1 -> x1y1
-    PP1, x2y0 -> r_x2y0_x2y1 -> x2y1
-    PP1, x3y0 -> r_x3y0_x3y1 -> x3y1
-    PP1, x4y0 -> r_x4y0_x4y1 -> x4y1
-    PP1, x5y0 -> r_x5y0_x5y1 -> x5y1
-    PP1, x6y0 -> r_x6y0_x6y1 -> x6y1
+    PP1, x1 -> r_x1_x1P -> x1P
+    PP1, x2 -> r_x2_x2P -> x2P
+    PP1, x3 -> r_x3_x3P -> x3P
+    PP1, x4 -> r_x4_x4P -> x4P
+    PP1, x5 -> r_x5_x5P -> x5P
+    PP1, x6 -> r_x6_x6P -> x6P
 
-
-//    // NOTE: Does dephosphorylation remove all phosphate or removes one by one.
-//    // I am assuming it removes all phosphatase.
-
-    r_x6y1_x0y0 [ numKb = 0, numKf = 10 ];
-    r_x5y1_x0y0 [ numKb = 0, numKf = 10 ];
-    r_x4y1_x0y0 [ numKb = 0, numKf = 10 ];
-    r_x3y1_x0y0 [ numKb = 0, numKf = 10 ];
-    r_x2y1_x0y0 [ numKb = 0, numKf = 10 ];
-    r_x1y1_x0y0 [ numKb = 0, numKf = 10 ];
-
-    x6y1 -> r_x6y1_x0y0 -> PP1, x6y0;
-    x5y1 -> r_x5y1_x0y0 -> PP1, x5y0;
-    x4y1 -> r_x4y1_x0y0 -> PP1, x4y0;
-    x3y1 -> r_x3y1_x0y0 -> PP1, x3y0;
-    x2y1 -> r_x2y1_x0y0 -> PP1, x2y0;
-    x1y1 -> r_x1y1_x0y0 -> PP1, x1y0;
-
-//    /** 
-//    * Turnover rate of PP1.Sp -> PP1
-//    * New holoenzyme is added to system one molecule per 30 hours. When the
-//    * switch is ON, this rate is significantly higher than the rate of
-//    * phosphorylation by basal Ca++ (approxy 3.5 hours) i.e. the new molecule
-//    * with turn ON by basal Ca++ thus keeping the switch ON.
-//    */
-    r_turnover_sp [ numKf = "1/108000", numKb = 0];
-    x6y0 -> r_turnover_sp -> PP1, x0y0;
-
-    /*
-     * Simulation related
+    /* Dephosphorylation steps. All 
      */
+    r_x6P_x0 [ Kb = 0, Kf = 10 ];
+    r_x5P_x0 [ Kb = 0, Kf = 10 ];
+    r_x4P_x0 [ Kb = 0, Kf = 10 ];
+    r_x3P_x0 [ Kb = 0, Kf = 10 ];
+    r_x2P_x0 [ Kb = 0, Kf = 10 ];
+    r_x1P_x0 [ Kb = 0, Kf = 10 ];
+
+    x6P -> r_x6P_x0 -> PP1, x5P;
+    x5P -> r_x5P_x0 -> PP1, x4P;
+    x4P -> r_x4P_x0 -> PP1, x3P;
+    x3P -> r_x3P_x0 -> PP1, x2P;
+    x2P -> r_x2P_x0 -> PP1, x1P;
+    x1P -> r_x1P_x0 -> PP1, x0;
+
+    /** 
+    * Turnover rate of PP1.Sp -> PP1
+    * New holoenzyme is added to system one molecule per 30 hours. When the
+    * switch is ON, this rate is significantly higher than the rate of
+    * phosphorylation by basal Ca++ (approxy 3.5 hours) i.e. the new molecule
+    * with turn ON by basal Ca++ thus keeping the switch ON.
+    */
+    r_turnover_sp [ numKf = "1/108000", numKb = 0];
+    x6 -> r_turnover_sp -> PP1, x0;
+
+
+    //// SIMULTIONS
 
     solver = gsolve
-    dt = 0.05
     plot_dt = 10
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-    sim_time = 40000
 
-    /* For a year simulation, I might see some some bistability */
-    //sim_time = 31536000
+    sim_time = "3600"
 
 }
