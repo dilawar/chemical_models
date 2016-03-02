@@ -79,9 +79,14 @@ mkdir -p $IMAGE_DIR
 
 $PYTHON ./run_model.py "$MODEL_FILE"
 
+#-y 1:20 \
 # Plot only if not in debug mode.
+rm -f "$MODEL_FILE.svg"
 if [ ! $DO_DEBUG ]; then 
-    ~/Scripts/plot_csv.py -i "$MODEL_FILE".dat -y "PP1_active.N,x6y0.N,ca.conc" -s -o $MODEL_FILE.svg
+    ~/Scripts/plot_csv.py -i "$MODEL_FILE".dat \
+        -y "PP1.N,PP1.conc,x0y0.N,x1y0.N,x1y1.N,x3y0,x6y0.N,ca.conc" \
+        -s -o $MODEL_FILE.svg
     echo "Copying image to $FILE_NAME_TIMESTAMPED".svg
     cp $MODEL_FILE.svg $FILE_NAME_TIMESTAMPED.svg
+    dot -Tpng ./camkii.yacml.dot > camkii.png
 fi
