@@ -45,7 +45,8 @@ compartment PSD {
     * Sp to S. The active concentration should be low for bistable switch to
     * work.
     */
-    PP1 [ N = 20, plot = N, constant = True ];
+    PP1_ [ N = 20  ]
+    PP1 [ N = 0, plot = N ]
 
     /**
     * @brief  Type: Reaction, Phosphorylates one subunit of CaMKII. This is a fast
@@ -121,9 +122,9 @@ compartment PSD {
 
     // This is a temporary pool. I'll put in the fractional value computed from
     // I1P.
-    PP1_ [ N = "PP1/(1+10*k3*I1P)", k3 = "1e5/(volume*AV)", plot = N]
-    r_pp1__pp1 [ kf = 100, kb = 100 ]
-    //PP1_ -> r_pp1__pp1 -> PP1;
+    r_pp1__pp1 [ numKf = "1/(1+(k3*I1P/k4))", numKb = 1
+        , k3 = "1e5/(volume*AV)", k4 = 0.1 ]
+    PP1_ -> r_pp1__pp1 -> PP1;
 
     /**
     * Now lets setup the dephosphorylation step.
