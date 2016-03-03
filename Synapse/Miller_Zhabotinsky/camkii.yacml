@@ -5,7 +5,7 @@
 compartment PSD {
 
     // Volume of PSD in SI units.
-    volume = "1e-20";
+    volume = "1e-21";
     AV = "6.023e23";               // Avagadro Number
     
     /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
@@ -175,10 +175,10 @@ compartment PSD {
     solver = gsolve
     dt = 5
 
-    plot_dt = 5
+    plot_dt = 1
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
 
-    sim_time = "28*3600"
+    sim_time = "7*3600"
 
 }
