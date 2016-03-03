@@ -82,7 +82,6 @@ $PYTHON ./run_model.py "$MODEL_FILE"
 
 #-y 1:20 \
 # Plot only if not in debug mode.
-rm -f "$MODEL_FILE.png"
 if [ ! $DO_DEBUG ]; then 
     ~/Scripts/plot_csv.py -i "$MODEL_FILE".dat \
         -y "PP1.N,PP1.conc,I1P.conc,x0.N,x1.N,x6.N,ca.conc" \

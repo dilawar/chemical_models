@@ -13,9 +13,9 @@ compartment PSD {
     * which can go up to 1e-3 This is input to many reaction.
     */
 
-    ca [ conc = "1e-4+1e-3*(t > 1000 && t <= 1002 ?1:0)" , plot = True ];
+    //ca [ conc = "1e-4+1e-3*(t > 1000 && t <= 1002 ?1:0)" , plot = True ];
     //ca  [ conc = "(cos(t)>=0.98)?(2e-4):(1e-4)", plot = conc ];
-    //ca [ conc = "1e-4", plot = conc ];
+    ca [ conc = "1e-4", plot = conc ];
 
     // CamKII molecules with x subunits of total 6 subunits phosporylated, and y
     // PP1 units are attached  to it.
@@ -45,7 +45,7 @@ compartment PSD {
     * Sp to S. The active concentration should be low for bistable switch to
     * work.
     */
-    PP1 [ N = 10, plot = N];
+    PP1 [ N = 20, plot = N];
 
     /**
     * @brief  Type: Reaction, Phosphorylates one subunit of CaMKII. This is a fast
@@ -65,22 +65,22 @@ compartment PSD {
     */
 
     // DO NOT multiply with 6.
-    r_0to1 [ numKb = 0, numKf =  "k1*(ca/kh1)^8/(1+(ca/kh1)^4)^2" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_0to1 [ numKb = 0, numKf =  "k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x0 -> r_0to1 -> x1;
 
-    r_x1_x2 [ numKb = 0, numKf = "k1*(ca/kh1)^4/(1+(ca/kh1)^4)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x1_x2 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x1 -> r_x1_x2 -> x2;
 
-    r_x2_x3 [ numKb = 0, numKf = "k1*(ca/kh1)^4/(1+(ca/kh1)^4)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x2_x3 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x2 -> r_x2_x3 -> x3;
 
-    r_x3_x4 [ numKb = 0, numKf = "k1*(ca/kh1)^4/(1+(ca/kh1)^4)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x3_x4 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x3 -> r_x3_x4 -> x4; 
 
-    r_x4_x5 [ numKb = 0, numKf = "k1*(ca/kh1)^4/(1+(ca/kh1)^4)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x4_x5 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x4 -> r_x4_x5 -> x5; 
 
-    r_x5_x6 [ numKb = 0, numKf = "k1*(ca/kh1)^4/(1+(ca/kh1)^4)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x5_x6 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x5 -> r_x5_x6 -> x6;
 
     /**
@@ -100,6 +100,12 @@ compartment PSD {
     * Its concentration is dependent on the value of I1_free. The stationary
     * level of free I1P is given by equation 4 in reference where authors
     * belives that they can write down the stationary level of I1P.
+    *
+    * NOTE: I1P needs to computed using a reaction rather than an expression but
+    * since these reactions are fast, one can write the stationary levels of I1P
+    * using the following expression. Furthermore, the reactions:
+    *    x?_P + I1P <--  --> x?_P.I1P 
+    * are not valid anymore.
     */
     I1P [ N = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
         , kh2 = "(0.3e-3*AV*volume)"
@@ -107,14 +113,13 @@ compartment PSD {
         plot = conc
         ];
 
-
     /**
     * @brief I1P inhibits PP1. 
     * Larger value of numKf in reactions r_i1p_pp1_cplx increases the likelyhood
     * of PP1 saturation which in turns make ON system more stable.
     */
     I1P_PP1 [ N = 0 ];
-    r_i1p_pp1_cplx [ numKf = "1e3*volume*AV", numKb = 0.1 ];
+    r_i1p_pp1_cplx [ kf = "1e5", kb = 0.1 ];
     I1P, PP1 -> r_i1p_pp1_cplx -> I1P_PP1;
 
     /**
@@ -139,8 +144,7 @@ compartment PSD {
     PP1, x5 -> r_x5_x5P -> x5P
     PP1, x6 -> r_x6_x6P -> x6P
 
-    /* Dephosphorylation steps. All 
-     */
+    // Dephosphorylation steps. All 
     r_x6P_x0 [ numKb = 0, numKf = 10 ];
     r_x5P_x0 [ numKb = 0, numKf = 10 ];
     r_x4P_x0 [ numKb = 0, numKf = 10 ];
@@ -155,31 +159,6 @@ compartment PSD {
     x2P -> r_x2P_x0 -> PP1, x1P;
     x1P -> r_x1P_x0 -> PP1, x0;
 
-    /* I1P and x_P makes complexes. */
-    x1P_I1P [ N = 0 ];
-    x2P_I1P [ N = 0 ];
-    x3P_I1P [ N = 0 ];
-    x4P_I1P [ N = 0 ];
-    x5P_I1P [ N = 0 ];
-    x6P_I1P [ N = 0 ];
-
-    r_x1p_i1p [ numKf = "1e5/(volume*AV)", numKb = 0.1 ]
-    x1P, I1P -> r_x1p_i1p -> x1P_I1P;
-
-    r_x2p_i1p [ numKf = "1e5/(volume*AV)", numKb = 0.1 ]
-    x2P, I1P -> r_x2p_i1p -> x2P_I1P;
-
-    r_x3p_i1p [ numKf = "1e5/(volume*AV)", numKb = 0.1 ]
-    x3P, I1P -> r_x3p_i1p -> x3P_I1P;
-
-    r_x4p_i1p [ numKf = "1e5/(volume*AV)", numKb = 0.1 ]
-    x4P, I1P -> r_x4p_i1p -> x4P_I1P;
-
-    r_x5p_i1p [ numKf = "1e5/(volume*AV)", numKb = 0.1 ]
-    x5P, I1P -> r_x5p_i1p -> x5P_I1P;
-
-    r_x6p_i1p [ numKf = "1e5/(volume*AV)", numKb = 0.1 ]
-    x6P, I1P -> r_x5p_i1p -> x6P_I1P;
 
     /** 
     * Turnover rate of PP1.Sp -> PP1
@@ -188,18 +167,18 @@ compartment PSD {
     * phosphorylation by basal Ca++ (approxy 3.5 hours) i.e. the new molecule
     * with turn ON by basal Ca++ thus keeping the switch ON.
     */
-    r_turnover_sp [ numKf = "1/108000", numKb = 0];
-    x6 -> r_turnover_sp -> PP1, x0;
+    //r_turnover_sp [ numKf = "1/108000", numKb = 0];
+    //x6 -> r_turnover_sp -> PP1, x0;
 
 
     // SIMULTIONS
     solver = gsolve
     dt = 5
 
-    plot_dt = 2
+    plot_dt = 5
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
 
-    sim_time = "30000"
+    sim_time = "28*3600"
 
 }
