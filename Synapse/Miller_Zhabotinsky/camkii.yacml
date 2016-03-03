@@ -5,7 +5,7 @@
 compartment PSD {
 
     // Volume of PSD in SI units.
-    volume = "1e-21";
+    volume = "4e-21";
     AV = "6.023e23";               // Avagadro Number
     
     /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
@@ -13,7 +13,7 @@ compartment PSD {
     * which can go up to 1e-3 This is input to many reaction.
     */
 
-    ca [ conc = "1e-4+1e-3*(t > 1000 && t <= 1003 ?1:0)" , plot = True ];
+    ca [ conc = "1e-4+1e-3*(t > 1000 && t <= 1002 ?1:0)" , plot = True ];
     //ca  [ conc = "(cos(t)>=0.98)?(2e-4):(1e-4)", plot = conc ];
     //ca [ conc = "1e-4", plot = conc ];
 
@@ -45,7 +45,7 @@ compartment PSD {
     * Sp to S. The active concentration should be low for bistable switch to
     * work.
     */
-    PP1_ [ N = 20  ]
+    PP1_ [ N = 10 ]
     PP1 [ N = 0, plot = N ]
 
     /**
@@ -66,19 +66,19 @@ compartment PSD {
     */
 
     // DO NOT multiply with 6.
-    r_0to1 [ numKb = 0, numKf =  "k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_0to1 [ numKb = 0, numKf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x0 -> r_0to1 -> x1;
 
-    r_x1_x2 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x1_x2 [ numKb = 0, numKf = "5*k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x1 -> r_x1_x2 -> x2;
 
-    r_x2_x3 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x2_x3 [ numKb = 0, numKf = "4*k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x2 -> r_x2_x3 -> x3;
 
-    r_x3_x4 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x3_x4 [ numKb = 0, numKf = "3*k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x3 -> r_x3_x4 -> x4; 
 
-    r_x4_x5 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x4_x5 [ numKb = 0, numKf = "2*k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
     x4 -> r_x4_x5 -> x5; 
 
     r_x5_x6 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
@@ -119,9 +119,6 @@ compartment PSD {
     * Larger value of numKf in reactions r_i1p_pp1_cplx increases the likelyhood
     * of PP1 saturation which in turns make ON system more stable.
     */
-
-    // This is a temporary pool. I'll put in the fractional value computed from
-    // I1P.
     r_pp1__pp1 [ numKf = "1/(1+(k3*I1P/k4))", numKb = 1
         , k3 = "1e5/(volume*AV)", k4 = 0.1 ]
     PP1_ -> r_pp1__pp1 -> PP1;
@@ -134,12 +131,12 @@ compartment PSD {
     * PP1Sp
     */
 
-    r_x1_x1P [ numKb = 0.0, numKf = "(k2/km)/6",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x2_x2P [ numKb = 0.0, numKf = "(k2/km)/5",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x3_x3P [ numKb = 0.0, numKf = "(k2/km)/4",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x4_x4P [ numKb = 0.0, numKf = "(k2/km)/3",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x5_x5P [ numKb = 0.0, numKf = "(k2/km)/2",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x6_x6P [ numKb = 0.0, numKf = "(k2/km)/1",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x1_x1P [ numKb = 0.0, numKf = "(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x2_x2P [ numKb = 0.0, numKf = "2*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x3_x3P [ numKb = 0.0, numKf = "3*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x4_x4P [ numKb = 0.0, numKf = "4*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x5_x5P [ numKb = 0.0, numKf = "5*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x6_x6P [ numKb = 0.0, numKf = "6*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
 
     PP1, x1 -> r_x1_x1P -> x1P
     PP1, x2 -> r_x2_x2P -> x2P
@@ -156,12 +153,12 @@ compartment PSD {
     r_x2P_x0 [ numKb = 0, numKf = 10 ];
     r_x1P_x0 [ numKb = 0, numKf = 10 ];
 
-    x6P -> r_x6P_x0 -> PP1, x5;
-    x5P -> r_x5P_x0 -> PP1, x4;
-    x4P -> r_x4P_x0 -> PP1, x3;
-    x3P -> r_x3P_x0 -> PP1, x2;
-    x2P -> r_x2P_x0 -> PP1, x1;
-    x1P -> r_x1P_x0 -> PP1, x0;
+    x6P -> r_x6P_x0 -> PP1_, x5;
+    x5P -> r_x5P_x0 -> PP1_, x4;
+    x4P -> r_x4P_x0 -> PP1_, x3;
+    x3P -> r_x3P_x0 -> PP1_, x2;
+    x2P -> r_x2P_x0 -> PP1_, x1;
+    x1P -> r_x1P_x0 -> PP1_, x0;
 
 
     /** 
@@ -183,6 +180,6 @@ compartment PSD {
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
 
-    sim_time = "7*3600"
+    sim_time = "3600"
 
 }
