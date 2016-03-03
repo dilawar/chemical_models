@@ -84,7 +84,7 @@ $PYTHON ./run_model.py "$MODEL_FILE"
 # Plot only if not in debug mode.
 if [ ! $DO_DEBUG ]; then 
     ~/Scripts/plot_csv.py -i "$MODEL_FILE".dat \
-        -y "PP1.N,PP1.conc,I1P.conc,x0.N,x1.N,x6.N,ca.conc" \
+        -y "PP1.N,PP1.conc,PP1_.N,x0.N,x1.N,x2.N,x6.N,ca.conc" \
         -s -o $MODEL_FILE.png
     echo "Copying image to $FILE_NAME_TIMESTAMPED".png
     cp $MODEL_FILE.png $FILE_NAME_TIMESTAMPED.png
