@@ -1,25 +1,38 @@
 /**
 * @brief Post Synaptic Density or PSD. This usually have volume in the range of
 * 1e6 cubic nano-meters.
+* ALL UNITS are in SI.
+* This system constains 4 CaMKII and 10 PP1 moclecules.
 */
 compartment PSD {
 
     // Volume of PSD in SI units.
-    volume = "4e-21";
-    AV = "6.023e23";               // Avagadro Number
-    
+    volume = "1e-21";
+    geometry = "cylinder";
+    AV = "6.023e23";               // Avogadro Number
+
+    // The ca++ activation Hill coefficient of CaMKII
+    kh1 = "(0.7e-3*volume*AV)"     
+
+    // Hill ca++ activation Hill coefficient of calcinurin.
+    kh2 = "(0.3e-3*volume*AV)" 
+
+    // The Michaelis constant of protein phosphotase 1 (PP1)
+    // km = "(0.3e-3*volume*AV)" 
+    km = "(0.3e-3*volume*AV)"
+
     /** @brief A pool of Ca++. Resting concentration is 0.1 uM.
     * @note Its concentration in PSD at basal level is approximately 1e-4 (mole/m^3)
     * which can go up to 1e-3 This is input to many reaction.
     */
 
-    ca [ conc = "1e-4+1e-3*(t > 1000 && t <= 1002 ?1:0)" , plot = True ];
-    //ca  [ conc = "(cos(t)>=0.98)?(2e-4):(1e-4)", plot = conc ];
+    //ca [ conc = "1e-4+0.7e-3*(t > 10 && t <= 15 ?1:0)" , plot = True ];
+    ca  [ conc = "(sin(t)>=0.8)?(1.6e-4):(0.8e-4)", plot = conc ];
     //ca [ conc = "1e-4", plot = conc ];
 
     // CamKII molecules with x subunits of total 6 subunits phosporylated, and y
     // PP1 units are attached  to it.
-    x0 [N = 20, plot = N];
+    x0 [N = 4, plot = N];
     x1 [N = 0, plot = N]; 
     x2 [N = 0, plot = N]; 
     x3 [N = 0, plot = N]; 
@@ -45,7 +58,7 @@ compartment PSD {
     * Sp to S. The active concentration should be low for bistable switch to
     * work.
     */
-    PP1_ [ N = 10 ]
+    PP1_ [ N = 1 ]
     PP1 [ N = 0, plot = N ]
 
     /**
@@ -66,22 +79,22 @@ compartment PSD {
     */
 
     // DO NOT multiply with 6.
-    r_0to1 [ numKb = 0, numKf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_0to1 [ numKb = 0, numKf =  "6*k1*(ca/kh1)^6/(1+(ca/kh1)^3)^2" ,  k1 = 1.5 ];
     x0 -> r_0to1 -> x1;
 
-    r_x1_x2 [ numKb = 0, numKf = "5*k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x1_x2 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" ,  k1 = 1.5 ];
     x1 -> r_x1_x2 -> x2;
 
-    r_x2_x3 [ numKb = 0, numKf = "4*k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x2_x3 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" ,  k1 = 1.5 ];
     x2 -> r_x2_x3 -> x3;
 
-    r_x3_x4 [ numKb = 0, numKf = "3*k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x3_x4 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" ,  k1 = 1.5 ];
     x3 -> r_x3_x4 -> x4; 
 
-    r_x4_x5 [ numKb = 0, numKf = "2*k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x4_x5 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" ,  k1 = 1.5 ];
     x4 -> r_x4_x5 -> x5; 
 
-    r_x5_x6 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" , kh1 = "(7e-4*volume*AV)", k1 = 1.5 ];
+    r_x5_x6 [ numKb = 0, numKf = "k1*(ca/kh1)^3/(1+(ca/kh1)^3)" ,  k1 = 1.5 ];
     x5 -> r_x5_x6 -> x6;
 
     /**
@@ -109,7 +122,6 @@ compartment PSD {
     * are not valid anymore.
     */
     I1P [ N = "I1_free*(vPKA/vCaN)*(1+(ca/kh2)^3)/(ca/kh2)^3"
-        , kh2 = "(0.3e-3*AV*volume)"
         , vPKA = 1, vCaN = 1
         plot = conc
         ];
@@ -119,9 +131,19 @@ compartment PSD {
     * Larger value of numKf in reactions r_i1p_pp1_cplx increases the likelyhood
     * of PP1 saturation which in turns make ON system more stable.
     */
-    r_pp1__pp1 [ numKf = "1/(1+(k3*I1P/k4))", numKb = 1
-        , k3 = "1e5/(volume*AV)", k4 = 0.1 ]
-    PP1_ -> r_pp1__pp1 -> PP1;
+
+    /* NOTE: Why this reaction is implemented this way. Because as soon a PP1 is
+     * released into PP1_ pool, it should be available in PP1 pool after few
+     * minutes. Here the time constant of reaction PP1_ --> PP1 is of hundred
+     * seconds.
+    */
+    r_pp1__pp1 [
+        numKf =  "(1+(k3*I1P/k4))*0.01"
+        , numKb = 0.01
+        , k3 = "1e5/(volume*AV)"
+        , k4 = 0.1 
+        ]
+    PP1 -> r_pp1__pp1 -> PP1_;
 
     /**
     * Now lets setup the dephosphorylation step.
@@ -131,12 +153,12 @@ compartment PSD {
     * PP1Sp
     */
 
-    r_x1_x1P [ numKb = 0.0, numKf = "(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x2_x2P [ numKb = 0.0, numKf = "2*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x3_x3P [ numKb = 0.0, numKf = "3*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x4_x4P [ numKb = 0.0, numKf = "4*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x5_x5P [ numKb = 0.0, numKf = "5*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
-    r_x6_x6P [ numKb = 0.0, numKf = "6*(k2/km)",  km = "(0.4e-3*volume*AV)", k2 = 10 ];
+    r_x1_x1P [ numKb = 0.0, numKf = "1*(k2/km)",  k2 = 10 ];
+    r_x2_x2P [ numKb = 0.0, numKf = "2*(k2/km)", k2 = 10 ];
+    r_x3_x3P [ numKb = 0.0, numKf = "3*(k2/km)", k2 = 10 ];
+    r_x4_x4P [ numKb = 0.0, numKf = "4*(k2/km)", k2 = 10 ];
+    r_x5_x5P [ numKb = 0.0, numKf = "5*(k2/km)", k2 = 10 ];
+    r_x6_x6P [ numKb = 0.0, numKf = "6*(k2/km)", k2 = 10 ];
 
     PP1, x1 -> r_x1_x1P -> x1P
     PP1, x2 -> r_x2_x2P -> x2P
@@ -176,10 +198,9 @@ compartment PSD {
     solver = gsolve
     dt = 5
 
-    plot_dt = 1
+    plot_dt = 10
 
     /* 2 second of Ca++ pulse [1 uM] phosphorylates 50% of CaMKII */
-
-    sim_time = "3600"
+    sim_time = "10*24*3600"
 
 }
